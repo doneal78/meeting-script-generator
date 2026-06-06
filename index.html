@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legato Security — Meeting Script Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F8F9FA;color:#1A1A1A;padding:24px;max-width:780px;margin:0 auto}
+h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
+.sub{font-size:13px;color:#888;margin-bottom:20px}
+.setup{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
+.fld label{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.06em}
+.fld input,.fld select{font-size:14px;padding:8px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit;width:100%}
+.fld input:focus,.fld select:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
+.gen-btn{padding:9px 20px;font-size:13px;font-weight:600;border-radius:6px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
+.gen-btn:hover{background:#2E5080}
+.print-btn{padding:9px 16px;font-size:13px;font-weight:500;border-radius:6px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none}
+.print-btn:hover{background:#F0F0F0}
+.btn-row{display:flex;gap:8px;margin-bottom:20px}
+.script{display:none}
+.script.on{display:block}
+.client-tag{display:inline-block;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:4px;padding:3px 10px;font-size:12px;color:#1F3A5F;font-weight:500;margin-bottom:14px}
+.leg{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:6px;font-size:12px;color:#666}
+.ld{width:12px;height:4px;border-radius:2px}
+.phase{margin-bottom:12px;border:1px solid #E0E0E0;border-radius:8px;overflow:hidden}
+.phd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#EEF2F7}
+.pl{font-size:10px;font-weight:600;color:#666;background:#fff;border:1px solid #CCC;padding:2px 7px;border-radius:3px}
+.pt{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
+.ptm{font-size:11px;color:#888}
+.phb{padding:12px 14px;background:#fff}
+.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.tip{border-left:3px solid #CCC;background:#F5F5F5;padding:9px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:12px;line-height:1.6;color:#555}
+.bl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.blr{color:#0F6E56}.blf{color:#8B5000}.blt{color:#888}
+@media print{
+  body{background:#fff;padding:12px;max-width:100%}
+  .setup,.btn-row,.print-btn,.gen-btn{display:none!important}
+  .script{display:block!important}
+  .phase{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<h1>Meeting Script Generator</h1>
+<p class="sub">Legato Security &mdash; enter a client name and meeting type, then generate your script.</p>
+
+<div class="setup">
+  <div class="fld">
+    <label>Client name</label>
+    <input type="text" id="clientName" placeholder="e.g. Acme Corp" />
+  </div>
+  <div class="fld">
+    <label>Primary contact</label>
+    <input type="text" id="contactName" placeholder="e.g. Sarah" />
+  </div>
+  <div class="fld">
+    <label>Meeting type</label>
+    <select id="meetingType">
+      <option value="weekly">Weekly Status Call</option>
+      <option value="kickoff">Kickoff Meeting</option>
+    </select>
+  </div>
+  <button class="gen-btn" onclick="generate()">Generate script</button>
+</div>
+
+<div class="btn-row">
+  <button class="print-btn" id="printBtn" onclick="window.print()">&#128438; Print / Save as PDF</button>
+</div>
+
+<div class="script" id="output"></div>
+
+<script>
+const W = (client, contact) => [
+  { num:1, name:'Opening', time:'~30 sec', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Good [morning/afternoon], ${contact} — David with Legato. Thanks for making time. Let's get into it."` },
+    { t:'tip', lbl:'Note', text:`Say ${contact}'s name before anything else. If others are on the call, acknowledge every name you see in the room first. This signals you know who is there and you are present.` }
+  ]},
+  { num:2, name:'Agenda set', time:'~30 sec', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Here's our plan today: action items from last week, current project and service status, anything that needs your attention, and next steps. Should take us about [X] minutes."` },
+    { t:'tip', lbl:'Note', text:'Never skip this line. It takes 15 seconds and immediately signals you are organized and running the call. Every call, without exception.' }
+  ]},
+  { num:3, name:'Action item review', time:'2–3 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:'"Before we get into today\'s update, let\'s check in on what we committed to last week."' },
+    { t:'fill', lbl:'Fill in — check status before the call', text:`"From our side: [Item 1] — [status]. [Item 2] — [status].\n\nFrom your side — ${contact}, you were going to [do X]. Did you get a chance to get into that?"` },
+    { t:'rail', lbl:'Memorize — if all items are closed', text:'"Everything from last week is resolved — clean slate heading into today\'s update."' },
+    { t:'rail', lbl:'Memorize — if items remain open', text:'"We have [#] items still in progress. I\'ll note those as we go and make sure they\'re captured in today\'s action items."' },
+    { t:'tip', lbl:'Tip', text:'Check the ticket and email status for every item before this call. "I believe I sent it" is not a status update.' }
+  ]},
+  { num:4, name:'Status update', time:'5–10 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:'"Alright — here\'s where things stand."' },
+    { t:'fill', lbl:'Fill in — structure: wins → progress → concerns', text:`Good news first: "[Completed item] — good milestone for ${client}."\n\nIn progress: "[Item] is on track / slightly behind. Expected completion [date]."\n\nFlagging a concern: "One thing I want to flag: [issue]. Here's what we're doing about it: [action]. I'll keep you posted on how that resolves."` },
+    { t:'tip', lbl:'Tip', text:'Every in-progress item needs a date or a next checkpoint. "We\'re working on it" without a date erodes confidence. Lead with good news — it keeps the call calm even when there are concerns to flag.' }
+  ]},
+  { num:5, name:'Needs from client', time:'2 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Before we get to next steps — there are a couple of things I need from your side to keep us moving."` },
+    { t:'fill', lbl:'Fill in — specific asks with dates', text:`"I need [specific item] by [specific date] to stay on schedule. If we can get that, we're good to keep moving."\n\n"[Other item] — that one's on us; you'll have it by [date]."` },
+    { t:'rail', lbl:'Memorize — if no blockers', text:`"Nothing blocking us from ${client}'s side right now — we're clear to keep driving forward."` },
+    { t:'tip', lbl:'Tip', text:'"Whenever you can" will never happen. Every ask needs a specific date. Name who on their team owns the item.' }
+  ]},
+  { num:6, name:'Next steps', time:'2 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:'"Before we close — let\'s lock in what happens next and who owns what."' },
+    { t:'rail', lbl:'Memorize — read back out loud', text:`"David will [item] by [date]. ${contact} will [item] by [date]. Does anyone have additions or corrections?"` },
+    { t:'tip', lbl:'Tip', text:'Say it out loud on the call — not just in your notes. Reading action items back is what separates a meeting that produces results from one that does not.' }
+  ]},
+  { num:7, name:'Close', time:'~30 sec', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"That wraps us up. I'll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks ${contact} — appreciate your time."` },
+    { t:'tip', lbl:'Tip', text:'Give a specific time for the recap email — not "I\'ll send something later." That follow-up is proof you ran a tight meeting. Send it fast.' }
+  ]}
+];
+
+const K = (client, contact) => [
+  { num:1, name:'Opening + welcome', time:'~2 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Good [morning/afternoon], everyone — David O'Neal, project manager at Legato Security. Really glad to have you all on and welcome to Legato. Let's make the most of the next [X] minutes."` },
+    { t:'fill', lbl:'Fill in — welcome attendees', text:`Welcome all ${client} attendees by name as you see them join. Once introductions are complete: "I'll turn it over to Brady for a brief intro, and then we'll get into the agenda."` },
+    { t:'tip', lbl:'Tip', text:'State your full name and role clearly at the start — this is the first call and they are still learning who is who. Slower and clearer than your weekly cadence.' }
+  ]},
+  { num:2, name:'Team introductions', time:'~3 min', blocks:[
+    { t:'rail', lbl:'Memorize — Legato side', text:`"On our side: I'm David O'Neal, your project manager and main point of contact throughout onboarding. Brady Schmidt, our VP of Customer Experience, is also on the line. Additional team members — engineering, the SOC — will be introduced as we move through each phase of the project."` },
+    { t:'fill', lbl:'Fill in — invite client side', text:`After Legato intros, invite ${client} to introduce their team: "I'd love to have everyone on your side do a quick intro — name, role, and anything specific you're hoping to get out of today."` },
+    { t:'tip', lbl:'Tip', text:'Listen carefully during their intros. Note who is technical vs. executive. This shapes how you communicate for the rest of the project.' }
+  ]},
+  { num:3, name:'Agenda overview', time:'~1 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Here's our plan for today: Legato overview and service scope, implementation milestones, how you'll track project progress in our system, and we'll close with clear next steps. The goal is to leave today with a shared picture of where we're headed and exactly what happens after this call."` }
+  ]},
+  { num:4, name:'Legato overview + scope', time:'~5 min', blocks:[
+    { t:'rail', lbl:'Memorize — lead-in', text:`"Quick overview of who Legato is and how we'll work together — then we'll get into your specific project."` },
+    { t:'fill', lbl:'Fill in — cover these five points', text:`1. We are a 24/7 managed security services provider. Our goal is to extend ${client}'s security team, not replace it.\n\n2. Core service: SOC as a service — continuous monitoring, triage, escalation, and response.\n\n3. The workflow: alerts from your tools flow through our enrichment layer to our analysts, who investigate and escalate to you only when it matters.\n\n4. Communication: Zendesk for tickets and escalations. GuideCX for project tracking. Weekly calls for status updates.\n\n5. What "live" looks like: SOC is actively monitoring, your team only gets called for things that genuinely need your attention.` },
+    { t:'tip', lbl:'Tip', text:'Hand off technical details to Brady: "Brady, I\'ll bring you in to walk through the workflow in more detail here." You own the project and process; he owns the technical depth.' }
+  ]},
+  { num:5, name:'Implementation milestones', time:'~5 min', blocks:[
+    { t:'rail', lbl:'Memorize — lead-in', text:'"Here\'s how the project is structured from today through go-live. I\'ll share my screen and walk you through it."' },
+    { t:'fill', lbl:'Fill in — walk GuideCX view', text:`Share the GuideCX project screen and cover each phase:\n• Kickoff (today) — project plan live, weekly cadence set, questionnaire sent\n• Discovery — questionnaire returned, access provisioned to tools\n• Configure + Ingest — log sources forwarded, SLA and escalation path finalized, automation tools connected\n• Baseline Review — detection engineering reviews alerts, gap analysis\n• SOC Meet and Greet — SOC team introduction\n• Go-Live — SOC confirms live monitoring, project closes\n\nEstimated end date: [from GuideCX]. Factors that affect timing: questionnaire turnaround, access provisioning speed, log ingestion.` },
+    { t:'tip', lbl:'Tip', text:'Know the end date before sharing your screen. Know what view to show. Navigate directly — do not search around while they are watching.' }
+  ]},
+  { num:6, name:'Next steps + questionnaire', time:'~5 min', blocks:[
+    { t:'rail', lbl:'Memorize', text:`"Before we close — here's exactly what happens after this call."` },
+    { t:'fill', lbl:'Fill in — confirm each item', text:`1. Follow-up email from me within the hour: kickoff deck, onboarding questionnaire, access sheet listing who from our team needs access to which ${client} tools, and available times for your weekly standing call.\n\n2. Questionnaire: fill out what you can quickly over the next week or two. If something will take months to gather, skip it for now — we'll revisit as the project progresses.\n\n3. Weekly cadence: we're proposing [day] at [time]. Does that work for everyone, or should we look at alternatives?` },
+    { t:'tip', lbl:'Tip', text:'Get ahead of questionnaire hesitation: "Fill out what you can quickly. Anything that takes more than a week to track down, we\'ll discuss as we get into the project." This removes the anxiety of a long form.' }
+  ]},
+  { num:7, name:'Questions + close', time:'~5 min', blocks:[
+    { t:'rail', lbl:'Memorize — open floor', text:'"Before we wrap up — any questions on what we covered, or anything you\'d like us to go back over?"' },
+    { t:'rail', lbl:'Memorize — close', text:`"That wraps up our kickoff. Really excited to be working with ${client} — you're in good hands. Watch for my email within the hour with everything we covered. ${contact}, if anything comes up before our first weekly call, my inbox is always open. Thanks everyone — great meeting."` },
+    { t:'tip', lbl:'Tip', text:'End with energy. This is the first impression — the whole team is watching. Forward-looking, specific follow-up commitment, genuinely warm. Never trail off on a kickoff call.' }
+  ]}
+];
+
+function generate() {
+  const client = document.getElementById('clientName').value.trim() || 'Client';
+  const contact = document.getElementById('contactName').value.trim() || 'Team';
+  const type = document.getElementById('meetingType').value;
+  const phases = type === 'kickoff' ? K(client, contact) : W(client, contact);
+  const label = type === 'kickoff' ? 'Kickoff Meeting' : 'Weekly Status Call';
+
+  let html = `<div class="client-tag">${client} &mdash; ${label}</div>
+  <div class="leg">
+    <div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>
+    <div class="li"><div class="ld" style="background:#DDA820"></div>Fill in with current status</div>
+    <div class="li"><div class="ld" style="background:#CCC"></div>Coaching tip</div>
+  </div>`;
+
+  for (const ph of phases) {
+    html += `<div class="phase">
+      <div class="phd">
+        <span class="pl">Phase ${ph.num}</span>
+        <span class="pt">${ph.name}</span>
+        <span class="ptm">${ph.time}</span>
+      </div><div class="phb">`;
+    for (const b of ph.blocks) {
+      const cls = b.t === 'rail' ? 'rail' : b.t === 'fill' ? 'fill' : 'tip';
+      const lc = b.t === 'rail' ? 'blr' : b.t === 'fill' ? 'blf' : 'blt';
+      html += `<div class="${cls}"><div class="bl ${lc}">${b.lbl}</div>${b.text.replace(/\n/g,'<br>')}</div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  const out = document.getElementById('output');
+  out.innerHTML = html;
+  out.className = 'script on';
+  document.getElementById('printBtn').style.display = 'inline-block';
+}
+</script>
+</body>
+</html>
