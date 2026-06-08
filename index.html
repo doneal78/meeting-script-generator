@@ -6,192 +6,448 @@
 <title>Meeting Script Generator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F8F9FA;color:#1A1A1A;padding:24px;max-width:780px;margin:0 auto}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F8F9FA;color:#1A1A1A;padding:24px;max-width:840px;margin:0 auto}
 h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
-.sub{font-size:13px;color:#888;margin-bottom:20px}
-.setup{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
-.fld label{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.06em}
-.fld input,.fld select{font-size:14px;padding:8px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit;width:100%}
-.fld input:focus,.fld select:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
-.gen-btn{padding:9px 20px;font-size:13px;font-weight:600;border-radius:6px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
-.gen-btn:hover{background:#2E5080}
-.print-btn{padding:9px 16px;font-size:13px;font-weight:500;border-radius:6px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none}
-.print-btn:hover{background:#F0F0F0}
+.sub{font-size:13px;color:#888;margin-bottom:16px}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.row-setup{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
+.fld label,.prep-lbl{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.fld input,.fld select,input.itext,input.idate,select.ism,textarea.ita{font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit}
+.fld input:focus,.fld select:focus,input.itext:focus,input.idate:focus,select.ism:focus,textarea.ita:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F;outline-offset:0}
+input.itext{flex:1;min-width:120px;width:100%}
+input.idate{width:130px;min-width:100px}
+select.ism{cursor:pointer}
+textarea.ita{width:100%;resize:vertical;min-height:56px;line-height:1.5}
+
+/* prep toggle */
+.prep-toggle{width:100%;padding:11px 20px;font-size:13px;font-weight:500;color:#1F3A5F;background:#F0F4F8;border:none;border-radius:10px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;margin-bottom:0}
+.prep-toggle:hover{background:#E4EEF7}
+.prep-body{padding:18px 20px;border-top:1px solid #E8E8E8;display:none}
+.prep-grp{margin-bottom:22px}
+.prep-grp:last-child{margin-bottom:0}
+.prep-grp-title{font-size:12px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #EEE}
+.prep-field{margin-bottom:10px}
+.drow{display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap}
+.rm{padding:4px 9px;font-size:14px;border-radius:5px;border:1px solid #E0E0E0;background:#fff;color:#AAA;cursor:pointer;flex-shrink:0;line-height:1}
+.rm:hover{background:#FEE2E2;border-color:#FCA5A5;color:#C33}
+.add-btn{padding:5px 13px;font-size:12px;border-radius:5px;border:1px dashed #BBB;background:#FAFAFA;color:#555;cursor:pointer;margin-top:2px}
+.add-btn:hover{background:#EEF4FF;border-color:#1F3A5F;color:#1F3A5F}
+
+/* buttons */
 .btn-row{display:flex;gap:8px;margin-bottom:20px}
-.script{display:none}
-.script.on{display:block}
-.client-tag{display:inline-block;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:4px;padding:3px 10px;font-size:12px;color:#1F3A5F;font-weight:500;margin-bottom:14px}
-.leg{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.gen-btn{padding:10px 22px;font-size:14px;font-weight:600;border-radius:7px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
+.gen-btn:hover{background:#2A4E82}
+.print-btn{padding:10px 16px;font-size:13px;font-weight:500;border-radius:7px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none}
+.print-btn:hover{background:#F0F0F0}
+
+/* output */
+.script{display:none}.script.on{display:block}
+.otag{display:inline-flex;align-items:center;gap:8px;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:5px;padding:4px 12px;font-size:12px;color:#1F3A5F;font-weight:500;margin-bottom:14px}
+.prep-badge{background:#1F3A5F;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.04em}
+.leg{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:6px;font-size:12px;color:#666}
 .ld{width:12px;height:4px;border-radius:2px}
 .phase{margin-bottom:12px;border:1px solid #E0E0E0;border-radius:8px;overflow:hidden}
 .phd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#EEF2F7}
-.pl{font-size:10px;font-weight:600;color:#666;background:#fff;border:1px solid #CCC;padding:2px 7px;border-radius:3px}
-.pt{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
-.ptm{font-size:11px;color:#888}
+.pl{font-size:10px;font-weight:700;color:#888;background:#fff;border:1px solid #D0D0D0;padding:2px 7px;border-radius:3px}
+.ptit{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
+.ptm{font-size:11px;color:#999}
 .phb{padding:12px 14px;background:#fff}
-.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:13px;line-height:1.7;color:#1A1A1A}
-.fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:13px;line-height:1.7;color:#1A1A1A}
-.tip{border-left:3px solid #CCC;background:#F5F5F5;padding:9px 12px;border-radius:0 5px 5px 0;margin-bottom:10px;font-size:12px;line-height:1.6;color:#555}
+.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.live{border-left-color:#1F3A5F!important;background:#EEF2F7!important}
+.tip{border-left:3px solid #DDD;background:#F5F5F5;padding:8px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:12px;line-height:1.6;color:#666}
 .bl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.blr{color:#0F6E56}.blf{color:#8B5000}.blt{color:#888}
+.blr{color:#0F6E56}.blf{color:#8B5000}.bll{color:#1F3A5F}.blt{color:#999}
+
 @media print{
   body{background:#fff;padding:12px;max-width:100%}
-  .setup,.btn-row,.print-btn,.gen-btn{display:none!important}
+  .card,.prep-toggle,.prep-body,.btn-row{display:none!important}
   .script{display:block!important}
-  .phase{break-inside:avoid;page-break-inside:avoid}
+  .phase{break-inside:avoid}
 }
 </style>
 </head>
 <body>
 
 <h1>Meeting Script Generator</h1>
-<p class="sub">Security Services &mdash; enter your details and generate a ready-to-drill script.</p>
+<p class="sub">Security Services &mdash; fill in your details, add meeting prep, and generate a ready-to-drill script.</p>
 
-<div class="setup">
-  <div class="fld">
-    <label>Your name</label>
-    <input type="text" id="yourName" placeholder="e.g. David" />
+<!-- SETUP -->
+<div class="card">
+  <div class="row-setup">
+    <div class="fld"><label>Your name</label><input type="text" id="yourName" placeholder="e.g. David" /></div>
+    <div class="fld"><label>Your company</label><input type="text" id="yourCompany" placeholder="e.g. Acme Security" /></div>
+    <div class="fld"><label>Client name</label><input type="text" id="clientName" placeholder="e.g. Coatue" /></div>
+    <div class="fld"><label>Primary contact</label><input type="text" id="contactName" placeholder="e.g. Sarah" /></div>
+    <div class="fld">
+      <label>Meeting type</label>
+      <select id="meetingType" onchange="onTypeChange()">
+        <option value="weekly">Weekly Status Call</option>
+        <option value="kickoff">Kickoff Meeting</option>
+      </select>
+    </div>
   </div>
-  <div class="fld">
-    <label>Your company</label>
-    <input type="text" id="yourCompany" placeholder="e.g. Acme Security" />
-  </div>
-  <div class="fld">
-    <label>Client name</label>
-    <input type="text" id="clientName" placeholder="e.g. Coatue" />
-  </div>
-  <div class="fld">
-    <label>Primary contact</label>
-    <input type="text" id="contactName" placeholder="e.g. Sarah" />
-  </div>
-  <div class="fld">
-    <label>Meeting type</label>
-    <select id="meetingType">
-      <option value="weekly">Weekly Status Call</option>
-      <option value="kickoff">Kickoff Meeting</option>
-    </select>
-  </div>
-  <button class="gen-btn" onclick="generate()">Generate script</button>
 </div>
 
+<!-- PREP TOGGLE -->
+<div class="card" style="padding:0;overflow:hidden">
+  <button class="prep-toggle" id="prepToggleBtn" onclick="togglePrep()">
+    <span id="prepArrow" style="font-size:11px">▶</span>
+    <span>Meeting prep</span>
+    <span style="font-weight:400;color:#999;font-size:12px">&nbsp;— optional &nbsp;·&nbsp; fills in the script automatically</span>
+  </button>
+  <div class="prep-body" id="prepBody">
+
+    <!-- WEEKLY PREP -->
+    <div id="weeklyPrep">
+
+      <div class="prep-grp">
+        <div class="prep-grp-title">Last week's commitments</div>
+        <div id="aiRows"></div>
+        <button class="add-btn" onclick="addAI()">+ Add item</button>
+      </div>
+
+      <div class="prep-grp">
+        <div class="prep-grp-title">This week's status</div>
+        <div class="prep-field">
+          <span class="prep-lbl">✓ &nbsp;Wins — what got done since last call</span>
+          <textarea class="ita" id="wins" placeholder="e.g. Baseline analysis sent to client. Ryan resolved the partial record failures."></textarea>
+        </div>
+        <div class="prep-field">
+          <span class="prep-lbl">→ &nbsp;In progress (item + expected date)</span>
+          <div id="ipRows"></div>
+          <button class="add-btn" onclick="addIP()">+ Add item</button>
+        </div>
+        <div class="prep-field">
+          <span class="prep-lbl">⚠ &nbsp;Flags to raise (concern + what you're doing about it)</span>
+          <div id="flagRows"></div>
+          <button class="add-btn" onclick="addFlag()">+ Add flag</button>
+        </div>
+      </div>
+
+      <div class="prep-grp">
+        <div class="prep-grp-title">What you need from them</div>
+        <div id="needRows"></div>
+        <button class="add-btn" onclick="addNeed()">+ Add item</button>
+      </div>
+
+      <div class="prep-grp">
+        <div class="prep-grp-title">Next call action items</div>
+        <div id="nsRows"></div>
+        <button class="add-btn" onclick="addNS()">+ Add item</button>
+      </div>
+
+    </div>
+
+    <!-- KICKOFF PREP -->
+    <div id="kickoffPrep" style="display:none">
+      <div class="prep-grp">
+        <div class="prep-grp-title">Pre-call context</div>
+        <div class="prep-field">
+          <span class="prep-lbl">Tools being onboarded</span>
+          <input type="text" class="itext" id="koTools" placeholder="e.g. Sumo Logic SIEM, CrowdStrike EDR" />
+        </div>
+        <div class="prep-field">
+          <span class="prep-lbl">Key stakeholders on their side</span>
+          <input type="text" class="itext" id="koStakeholders" placeholder="e.g. Sarah (CISO), Eric (IT Admin), Patrick (SOC)" />
+        </div>
+        <div class="prep-field">
+          <span class="prep-lbl">Anything specific to cover or address</span>
+          <textarea class="ita" id="koNotes" placeholder="e.g. Client has concerns about shared accounts. Confirm access process with Eric."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BUTTONS -->
 <div class="btn-row">
+  <button class="gen-btn" onclick="generate()">Generate script</button>
   <button class="print-btn" id="printBtn" onclick="window.print()">&#128438; Print / Save as PDF</button>
 </div>
 
+<!-- OUTPUT -->
 <div class="script" id="output"></div>
 
 <script>
-const W = (name, company, client, contact) => [
-  { num:1, name:'Opening', time:'~30 sec', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"Good [morning/afternoon], ${contact} — ${name} with ${company}. Thanks for making time. Let's get into it."` },
-    { t:'tip', lbl:'Note', text:`Say ${contact}'s name before anything else. If others are on the call, acknowledge every name you see in the room first. This signals you know who is there and you are present.` }
-  ]},
-  { num:2, name:'Agenda set', time:'~30 sec', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"Here's our plan today: action items from last week, current project and service status, anything that needs your attention, and next steps. Should take us about [X] minutes."` },
-    { t:'tip', lbl:'Note', text:'Never skip this line. It takes 15 seconds and immediately signals you are organized and running the call. Every call, without exception.' }
-  ]},
-  { num:3, name:'Action item review', time:'2–3 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:'"Before we get into today\'s update, let\'s check in on what we committed to last week."' },
-    { t:'fill', lbl:'Fill in — check status before the call', text:`"From our side: [Item 1] — [status]. [Item 2] — [status].\n\nFrom your side — ${contact}, you were going to [do X]. Did you get a chance to get into that?"` },
-    { t:'rail', lbl:'Memorize — if all items are closed', text:'"Everything from last week is resolved — clean slate heading into today\'s update."' },
-    { t:'rail', lbl:'Memorize — if items remain open', text:'"We have [#] items still in progress. I\'ll note those as we go and make sure they\'re captured in today\'s action items."' },
-    { t:'tip', lbl:'Tip', text:'Check the ticket and notes status for every item before this call. "I believe I sent it" is not a status update.' }
-  ]},
-  { num:4, name:'Status update', time:'5–10 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:'"Alright — here\'s where things stand."' },
-    { t:'fill', lbl:'Fill in — structure: wins → progress → concerns', text:`Good news first: "[Completed item] — good milestone for ${client}."\n\nIn progress: "[Item] is on track / slightly behind. Expected completion [date]."\n\nFlagging a concern: "One thing I want to flag: [issue]. Here's what we're doing about it: [action]. I'll keep you posted on how that resolves."` },
-    { t:'tip', lbl:'Tip', text:'Every in-progress item needs a date or a next checkpoint. "We\'re working on it" without a date erodes confidence. Lead with good news — it keeps the call calm even when there are concerns.' }
-  ]},
-  { num:5, name:'Needs from client', time:'2 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:'"Before we get to next steps — there are a couple of things I need from your side to keep us moving."' },
-    { t:'fill', lbl:'Fill in — specific asks with dates', text:`"I need [specific item] by [specific date] to stay on schedule. If we can get that, we're good to keep moving."\n\n"[Other item] — that one's on us; you'll have it by [date]."` },
-    { t:'rail', lbl:'Memorize — if no blockers', text:`"Nothing blocking us from ${client}'s side right now — we're clear to keep driving forward."` },
-    { t:'tip', lbl:'Tip', text:'"Whenever you can" will never happen. Every ask needs a specific date. Name who on their team owns the item.' }
-  ]},
-  { num:6, name:'Next steps', time:'2 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:'"Before we close — let\'s lock in what happens next and who owns what."' },
-    { t:'rail', lbl:'Memorize — read back out loud', text:`"${name} will [item] by [date]. ${contact} will [item] by [date]. Does anyone have additions or corrections?"` },
-    { t:'tip', lbl:'Tip', text:'Say it out loud on the call — not just in your notes. Reading action items back is what separates a meeting that produces results from one that does not.' }
-  ]},
-  { num:7, name:'Close', time:'~30 sec', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"That wraps us up. I'll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks ${contact} — appreciate your time."` },
-    { t:'tip', lbl:'Tip', text:'Give a specific time for the recap email — not "I\'ll send something later." That follow-up is proof you ran a tight meeting. Send it fast.' }
-  ]}
-];
+// ── UI helpers ────────────────────────────────────────────────────────────
+function togglePrep() {
+  const b = document.getElementById('prepBody');
+  const open = b.style.display === 'none' || b.style.display === '';
+  b.style.display = open ? 'block' : 'none';
+  document.getElementById('prepArrow').textContent = open ? '▼' : '▶';
+}
 
-const K = (name, company, client, contact) => [
-  { num:1, name:'Opening + welcome', time:'~2 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"Good [morning/afternoon], everyone — ${name}, project manager at ${company}. Really glad to have you all on and welcome to ${company}. Let's make the most of the next [X] minutes."` },
-    { t:'fill', lbl:'Fill in — welcome attendees', text:`Welcome all ${client} attendees by name as you see them join. Once introductions are complete: "I'll turn it over to [Technical Lead] for a brief intro, and then we'll get into the agenda."` },
-    { t:'tip', lbl:'Tip', text:'State your full name and role clearly — this is the first call and they are still learning who is who. Slower and clearer than your weekly cadence.' }
-  ]},
-  { num:2, name:'Team introductions', time:'~3 min', blocks:[
-    { t:'rail', lbl:'Memorize — your side', text:`"On our side: I'm ${name}, your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members — engineering, the SOC — will be introduced as we move through each phase of the project."` },
-    { t:'fill', lbl:'Fill in — invite client side', text:`After your team's intros, invite ${client} to introduce their team: "I'd love to have everyone on your side do a quick intro — name, role, and anything specific you're hoping to get out of today."` },
-    { t:'tip', lbl:'Tip', text:'Listen carefully during their intros. Note who is technical vs. executive. This shapes how you communicate for the rest of the project.' }
-  ]},
-  { num:3, name:'Agenda overview', time:'~1 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"Here's our plan for today: overview of ${company} and service scope, implementation milestones, how you'll track project progress, and we'll close with clear next steps. The goal is to leave today with a shared picture of where we're headed and exactly what happens after this call."` }
-  ]},
-  { num:4, name:'Company overview + scope', time:'~5 min', blocks:[
-    { t:'rail', lbl:'Memorize — lead-in', text:`"Quick overview of who ${company} is and how we'll work together — then we'll get into your specific project."` },
-    { t:'fill', lbl:'Fill in — cover these five points', text:`1. We are a 24/7 managed security services provider. Our goal is to extend ${client}'s security team, not replace it.\n\n2. Core service: SOC as a service — continuous monitoring, triage, escalation, and response.\n\n3. The workflow: alerts from your tools flow through our enrichment and triage process to our analysts, who investigate and escalate to you only when it matters.\n\n4. Communication: [ticketing system] for escalations and requests. [project tracker] for onboarding progress. Weekly calls for status.\n\n5. What "live" looks like: SOC is actively monitoring, your team only gets called for things that genuinely need your attention.` },
-    { t:'tip', lbl:'Tip', text:'Hand off technical details to your technical lead: "[Technical Lead], I\'ll bring you in to walk through the workflow in more detail here." You own the project and process; they own the technical depth.' }
-  ]},
-  { num:5, name:'Implementation milestones', time:'~5 min', blocks:[
-    { t:'rail', lbl:'Memorize — lead-in', text:'"Here\'s how the project is structured from today through go-live. I\'ll share my screen and walk you through it."' },
-    { t:'fill', lbl:'Fill in — walk your project tracker', text:`Share your project tracker screen and cover each phase:\n• Kickoff (today) — project plan live, weekly cadence set, questionnaire sent\n• Discovery — questionnaire returned, access provisioned to tools\n• Configure + Ingest — log sources confirmed, SLA and escalation path finalized, automation tools connected\n• Baseline Review — detection engineering reviews alerts, gap analysis complete\n• SOC Meet and Greet — SOC team introduction\n• Go-Live — SOC confirms live monitoring, project closes\n\nEstimated end date: [from project tracker]. Factors that affect timing: questionnaire turnaround, access provisioning speed, log ingestion.` },
-    { t:'tip', lbl:'Tip', text:'Know the end date before sharing your screen. Navigate directly to the right view — do not search around while they are watching.' }
-  ]},
-  { num:6, name:'Next steps + questionnaire', time:'~5 min', blocks:[
-    { t:'rail', lbl:'Memorize', text:`"Before we close — here's exactly what happens after this call."` },
-    { t:'fill', lbl:'Fill in — confirm each item', text:`1. Follow-up email from me within the hour: kickoff deck, onboarding questionnaire, access sheet listing who from our team needs access to which ${client} tools, and available times for your weekly standing call.\n\n2. Questionnaire: fill out what you can quickly over the next week or two. If something takes months to gather, skip it for now — we'll revisit as the project progresses.\n\n3. Weekly cadence: we're proposing [day] at [time]. Does that work for everyone?` },
-    { t:'tip', lbl:'Tip', text:'Get ahead of questionnaire hesitation: "Fill out what you can quickly. Anything that takes more than a week to track down, we\'ll discuss as we get into the project." This removes the anxiety of a long form.' }
-  ]},
-  { num:7, name:'Questions + close', time:'~5 min', blocks:[
-    { t:'rail', lbl:'Memorize — open floor', text:'"Before we wrap up — any questions on what we covered, or anything you\'d like us to go back over?"' },
-    { t:'rail', lbl:'Memorize — close', text:`"That wraps up our kickoff. Really excited to be working with ${client} — you're in good hands. Watch for my email within the hour. ${contact}, if anything comes up before our first weekly call, my inbox is always open. Thanks everyone — great meeting."` },
-    { t:'tip', lbl:'Tip', text:'End with energy. This is the first impression the whole team is watching. Forward-looking, specific follow-up commitment, genuinely warm. Never trail off on a kickoff call.' }
-  ]}
-];
+function onTypeChange() {
+  const w = document.getElementById('meetingType').value === 'weekly';
+  document.getElementById('weeklyPrep').style.display = w ? 'block' : 'none';
+  document.getElementById('kickoffPrep').style.display = w ? 'none' : 'block';
+}
 
+function row(inner) {
+  const d = document.createElement('div');
+  d.className = 'drow';
+  d.innerHTML = inner + '<button class="rm" onclick="this.parentElement.remove()">&#215;</button>';
+  return d;
+}
+
+function addAI() {
+  document.getElementById('aiRows').appendChild(row(
+    '<select class="ism" data-role="ai-owner"><option value="us">Our side</option><option value="client">Client side</option></select>' +
+    '<input type="text" class="itext" data-role="ai-text" placeholder="What was committed..." />' +
+    '<select class="ism" data-role="ai-status"><option value="done">✓ Done</option><option value="progress">→ In progress</option><option value="blocked">⚠ Blocked</option></select>'
+  ));
+}
+function addIP() {
+  document.getElementById('ipRows').appendChild(row(
+    '<input type="text" class="itext" data-role="ip-text" placeholder="What\'s in progress..." />' +
+    '<input type="text" class="idate" data-role="ip-date" placeholder="Expected by..." />'
+  ));
+}
+function addFlag() {
+  document.getElementById('flagRows').appendChild(row(
+    '<input type="text" class="itext" data-role="flag-text" placeholder="Concern to flag..." />' +
+    '<input type="text" class="itext" data-role="flag-action" placeholder="What we\'re doing about it..." />'
+  ));
+}
+function addNeed() {
+  document.getElementById('needRows').appendChild(row(
+    '<input type="text" class="itext" data-role="need-text" placeholder="What you need from them..." />' +
+    '<input type="text" class="idate" data-role="need-date" placeholder="By when..." />'
+  ));
+}
+function addNS() {
+  document.getElementById('nsRows').appendChild(row(
+    '<select class="ism" data-role="ns-owner"><option value="us">Me</option><option value="client">Client</option></select>' +
+    '<input type="text" class="itext" data-role="ns-text" placeholder="Action item..." />' +
+    '<input type="text" class="idate" data-role="ns-date" placeholder="By when..." />'
+  ));
+}
+
+// ── Collect prep ──────────────────────────────────────────────────────────
+function vals(container, role) {
+  return [...document.querySelectorAll('#' + container + ' [data-role="' + role + '"]')]
+    .map(el => el.value.trim());
+}
+
+function getPrep() {
+  const aiText   = vals('aiRows','ai-text');
+  const aiOwner  = vals('aiRows','ai-owner');
+  const aiStatus = vals('aiRows','ai-status');
+  const actionItems = aiText.map((t,i) => ({text:t, owner:aiOwner[i], status:aiStatus[i]})).filter(i=>i.text);
+
+  const ipText = vals('ipRows','ip-text');
+  const ipDate = vals('ipRows','ip-date');
+  const inProgress = ipText.map((t,i) => ({text:t, date:ipDate[i]})).filter(i=>i.text);
+
+  const fText   = vals('flagRows','flag-text');
+  const fAction = vals('flagRows','flag-action');
+  const flags = fText.map((t,i) => ({text:t, action:fAction[i]})).filter(i=>i.text);
+
+  const nText = vals('needRows','need-text');
+  const nDate = vals('needRows','need-date');
+  const needs = nText.map((t,i) => ({text:t, date:nDate[i]})).filter(i=>i.text);
+
+  const nsOwner = vals('nsRows','ns-owner');
+  const nsText  = vals('nsRows','ns-text');
+  const nsDate  = vals('nsRows','ns-date');
+  const nextSteps = nsText.map((t,i) => ({text:t, owner:nsOwner[i], date:nsDate[i]})).filter(i=>i.text);
+
+  const wins = (document.getElementById('wins')||{}).value?.trim() || '';
+  return { actionItems, wins, inProgress, flags, needs, nextSteps };
+}
+
+function hasPrep(p) {
+  return p.actionItems.length || p.wins || p.inProgress.length || p.flags.length || p.needs.length || p.nextSteps.length;
+}
+
+// ── Build fill-in text from prep ──────────────────────────────────────────
+const SL = { done:'complete', progress:'still in progress', blocked:'blocked — flagging that now' };
+
+function p3text(prep, contact) {
+  const ai = prep.actionItems;
+  if (!ai.length) return null;
+  const us   = ai.filter(i=>i.owner==='us');
+  const them = ai.filter(i=>i.owner==='client');
+  const parts = [];
+  if (us.length)   parts.push('"From our side: '   + us.map(i=>i.text+' \u2014 '+(SL[i.status]||i.status)).join('; ') + '."');
+  if (them.length) parts.push('"From your side, ' + contact + ' \u2014 ' + them.map(i=>i.text+' \u2014 '+(SL[i.status]||i.status)).join('; ') + '."');
+  return parts.join('\n\n');
+}
+
+function p4text(prep, client) {
+  const { wins, inProgress, flags } = prep;
+  if (!wins && !inProgress.length && !flags.length) return null;
+  const parts = [];
+  if (wins) parts.push('"Good news first \u2014 ' + wins + '"');
+  inProgress.forEach(i => parts.push('"' + i.text + ' is in progress.' + (i.date ? ' Expected completion ' + i.date + '.' : '') + '"'));
+  flags.forEach(f => parts.push('"One thing I want to flag: ' + f.text + '.' + (f.action ? " Here\u2019s what we\u2019re doing about it: " + f.action + '.' : '') + ' I\u2019ll keep you posted."'));
+  return parts.join('\n\n');
+}
+
+function p5text(prep) {
+  if (!prep.needs.length) return null;
+  return prep.needs.map(n => '"I need ' + n.text + (n.date ? ' by ' + n.date : '') + ' to stay on schedule."').join('\n\n');
+}
+
+function p6text(prep, contact, name) {
+  if (!prep.nextSteps.length) return null;
+  const list = prep.nextSteps.map(s =>
+    (s.owner==='us' ? name : contact) + ' will ' + s.text + (s.date ? ' by ' + s.date : '')
+  ).join('. ');
+  return '"' + list + '. Does anyone have additions or corrections?"';
+}
+
+// ── Block factory ─────────────────────────────────────────────────────────
+function B(t, lbl, text, live) { return {t, lbl, text: text||'', live:!!live}; }
+
+// ── Weekly script ─────────────────────────────────────────────────────────
+function weekly(name, company, client, contact, prep) {
+  const pp = hasPrep(prep);
+  const r3 = p3text(prep, contact);
+  const r4 = p4text(prep, client);
+  const r5 = p5text(prep);
+  const r6 = p6text(prep, contact, name);
+
+  return [
+    { num:1, name:'Opening', time:'~30 sec', blocks:[
+      B('rail','Memorize', '"Good [morning/afternoon], '+contact+' \u2014 '+name+' with '+company+'. Thanks for making time. Let\u2019s get into it."'),
+      B('tip','Note', 'Say '+contact+'\'s name before anything else. If others are on the call, acknowledge every name you see first.')
+    ]},
+    { num:2, name:'Agenda set', time:'~30 sec', blocks:[
+      B('rail','Memorize', '"Here\u2019s our plan today: action items from last week, current project and service status, anything that needs your attention, and next steps. Should take us about [X] minutes."'),
+      B('tip','Note', 'Never skip this line. 15 seconds \u2014 it signals you are organized and running the call. Every call, without exception.')
+    ]},
+    { num:3, name:'Action item review', time:'2\u20133 min', blocks:[
+      B('rail','Memorize', '"Before we get into today\u2019s update, let\u2019s check in on what we committed to last week."'),
+      r3 ? B('fill','From your prep', r3, true)
+         : B('fill','Fill in \u2014 check status before the call', '"From our side: [Item 1] \u2014 [status]. [Item 2] \u2014 [status].\n\nFrom your side \u2014 '+contact+', you were going to [do X]. Did you get a chance to get into that?"'),
+      ...(!r3 ? [
+        B('rail','Memorize \u2014 if all items are closed', '"Everything from last week is resolved \u2014 clean slate heading into today\u2019s update."'),
+        B('rail','Memorize \u2014 if items remain open', '"We have [#] items still in progress. I\u2019ll note those as we go and make sure they\u2019re captured in today\u2019s action items."'),
+      ] : []),
+      B('tip','Tip', '"I believe I sent it" is not a status update. Check the ticket and notes before this call starts.')
+    ]},
+    { num:4, name:'Status update', time:'5\u201310 min', blocks:[
+      B('rail','Memorize', '"Alright \u2014 here\u2019s where things stand."'),
+      r4 ? B('fill','From your prep', r4, true)
+         : B('fill','Fill in \u2014 wins \u2192 progress \u2192 concerns', 'Good news first: "[Completed item] \u2014 solid milestone for '+client+'."\n\nIn progress: "[Item] is on track / slightly behind. Expected completion [date]."\n\nFlagging a concern: "One thing I want to flag: [issue]. Here\u2019s what we\u2019re doing about it: [action]. I\u2019ll keep you posted."'),
+      B('tip','Tip', 'Every in-progress item needs a date or next checkpoint. Lead with good news \u2014 it keeps the call calm even when there are concerns.')
+    ]},
+    { num:5, name:'Needs from client', time:'2 min', blocks:[
+      B('rail','Memorize', '"Before we get to next steps \u2014 there are a couple of things I need from your side to keep us moving."'),
+      r5 ? B('fill','From your prep', r5, true)
+         : B('fill','Fill in \u2014 specific asks with dates', '"I need [specific item] by [specific date] to stay on schedule.\n\n[Other item] \u2014 that one\u2019s on us; you\u2019ll have it by [date]."'),
+      B('rail','Memorize \u2014 if no blockers', '"Nothing blocking us from '+client+'\u2019s side right now \u2014 we\u2019re clear to keep driving forward."'),
+      B('tip','Tip', '"Whenever you can" will never happen. Every ask needs a specific date. Name who on their team owns it.')
+    ]},
+    { num:6, name:'Next steps', time:'2 min', blocks:[
+      B('rail','Memorize', '"Before we close \u2014 let\u2019s lock in what happens next and who owns what."'),
+      r6 ? B('fill','From your prep', r6, true)
+         : B('fill','Memorize \u2014 read back out loud', '"'+name+' will [item] by [date]. '+contact+' will [item] by [date]. Does anyone have additions or corrections?"'),
+      B('tip','Tip', 'Say it out loud on the call \u2014 not just in your notes. Reading action items back is what separates meetings that produce results from ones that don\u2019t.')
+    ]},
+    { num:7, name:'Close', time:'~30 sec', blocks:[
+      B('rail','Memorize', '"That wraps us up. I\u2019ll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks '+contact+' \u2014 appreciate your time."'),
+      B('tip','Tip', 'Give a specific time for the recap \u2014 not "I\u2019ll send something later." That follow-up is proof you ran a tight meeting. Send it fast.')
+    ]}
+  ];
+}
+
+// ── Kickoff script ────────────────────────────────────────────────────────
+function kickoff(name, company, client, contact) {
+  const tools = (document.getElementById('koTools')||{}).value?.trim() || '';
+  const stak  = (document.getElementById('koStakeholders')||{}).value?.trim() || '';
+  const notes = (document.getElementById('koNotes')||{}).value?.trim() || '';
+
+  return [
+    { num:1, name:'Opening + welcome', time:'~2 min', blocks:[
+      B('rail','Memorize', '"Good [morning/afternoon], everyone \u2014 '+name+', project manager at '+company+'. Really glad to have you all on and welcome to '+company+'. Let\u2019s make the most of the next [X] minutes."'),
+      stak ? B('fill','From your prep', 'Acknowledge these stakeholders as they join: '+stak+'.', true)
+           : B('fill','Fill in \u2014 welcome attendees', 'Welcome all '+client+' attendees by name as you see them join. Once introductions are complete: "I\u2019ll turn it over to [Technical Lead] for a brief intro, and then we\u2019ll get into the agenda."'),
+      B('tip','Tip', 'State your full name and role clearly \u2014 first call, they are still learning who is who. Slower and clearer than your weekly cadence.')
+    ]},
+    { num:2, name:'Team introductions', time:'~3 min', blocks:[
+      B('rail','Memorize \u2014 your side', '"On our side: I\u2019m '+name+', your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members will be introduced as we move through each project phase."'),
+      B('fill','Fill in \u2014 invite client side', 'After your team\u2019s intros, invite '+client+' to introduce their team: "I\u2019d love to have everyone on your side do a quick intro \u2014 name, role, and anything specific you\u2019re hoping to get out of today."'),
+      B('tip','Tip', 'Listen carefully. Note who is technical vs. executive \u2014 it shapes how you communicate for the rest of the project.')
+    ]},
+    { num:3, name:'Agenda overview', time:'~1 min', blocks:[
+      B('rail','Memorize', '"Here\u2019s our plan for today: overview of '+company+' and service scope, implementation milestones, how you\u2019ll track project progress, and clear next steps. The goal is to leave today with a shared picture of where we\u2019re headed and exactly what happens after this call."')
+    ]},
+    { num:4, name:'Company overview + scope', time:'~5 min', blocks:[
+      B('rail','Memorize \u2014 lead-in', '"Quick overview of who '+company+' is and how we\u2019ll work together \u2014 then we\u2019ll get into your specific project."'),
+      B('fill','Fill in \u2014 five key points', (tools ? 'Tools being onboarded: '+tools+'.\n\n' : '') +
+        '1. We are a 24/7 managed security services provider \u2014 extend '+client+'\u2019s team, not replace it.\n' +
+        '2. Core service: SOC as a service \u2014 continuous monitoring, triage, escalation, response.\n' +
+        '3. Workflow: alerts from your tools \u2192 enrichment and triage \u2192 our analysts investigate \u2192 escalate to you only when it matters.\n' +
+        '4. Communication: [ticketing system] for escalations, [project tracker] for onboarding progress, weekly calls for status.\n' +
+        '5. \u201cLive\u201d means: SOC actively monitoring, your team only called for things that need your attention.', !!tools),
+      notes ? B('fill','Pre-call notes to address', notes, true) : null,
+      B('tip','Tip', 'Hand off technical details to your technical lead: "[Technical Lead], I\u2019ll bring you in here." You own the process; they own the depth.')
+    ].filter(Boolean)},
+    { num:5, name:'Implementation milestones', time:'~5 min', blocks:[
+      B('rail','Memorize \u2014 lead-in', '"Here\u2019s how the project is structured from today through go-live. I\u2019ll share my screen and walk you through it."'),
+      B('fill','Fill in \u2014 walk your project tracker', 'Share your project tracker and walk through each phase:\n\u2022 Kickoff (today) \u2014 plan live, weekly cadence set, questionnaire sent\n\u2022 Discovery \u2014 questionnaire returned, access provisioned\n\u2022 Configure + Ingest \u2014 log sources confirmed, SLA finalized, automation tools connected\n\u2022 Baseline Review \u2014 detection engineering review, gap analysis\n\u2022 SOC Meet and Greet \u2014 SOC team introduction\n\u2022 Go-Live \u2014 SOC confirms live monitoring, project closes\n\nEstimated end date: [from your tracker].'),
+      B('tip','Tip', 'Know the end date before sharing your screen. Navigate directly \u2014 do not search around while they are watching.')
+    ]},
+    { num:6, name:'Next steps + questionnaire', time:'~5 min', blocks:[
+      B('rail','Memorize', '"Before we close \u2014 here\u2019s exactly what happens after this call."'),
+      B('fill','Fill in \u2014 confirm each item', '1. Follow-up email from me within the hour: kickoff deck, onboarding questionnaire, access sheet listing who from our team needs access to which '+client+' tools, and available times for your weekly standing call.\n\n2. Questionnaire: fill out what you can quickly over the next week or two. If something takes months to gather, skip it \u2014 we\u2019ll revisit as we go.\n\n3. Weekly cadence: proposing [day] at [time]. Does that work for everyone?'),
+      B('tip','Tip', 'Get ahead of questionnaire hesitation: "Fill out what you can quickly. Anything that takes more than a week to track down, we\u2019ll discuss as we get into the project." Removes the anxiety.')
+    ]},
+    { num:7, name:'Questions + close', time:'~5 min', blocks:[
+      B('rail','Memorize \u2014 open floor', '"Before we wrap up \u2014 any questions on what we covered, or anything you\u2019d like us to go back over?"'),
+      B('rail','Memorize \u2014 close', '"That wraps up our kickoff. Really excited to be working with '+client+' \u2014 you\u2019re in good hands. Watch for my email within the hour. '+contact+', if anything comes up before our first weekly call, my inbox is always open. Thanks everyone \u2014 great meeting."'),
+      B('tip','Tip', 'End with energy. First impression \u2014 the whole team is watching. Forward-looking, specific follow-up commitment, genuinely warm. Never trail off on a kickoff.')
+    ]}
+  ];
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
 function generate() {
   const name    = document.getElementById('yourName').value.trim()    || '[Your Name]';
   const company = document.getElementById('yourCompany').value.trim() || '[Your Company]';
   const client  = document.getElementById('clientName').value.trim()  || 'Client';
   const contact = document.getElementById('contactName').value.trim() || 'Team';
   const type    = document.getElementById('meetingType').value;
-  const phases  = type === 'kickoff' ? K(name, company, client, contact) : W(name, company, client, contact);
+  const prep    = getPrep();
+  const phases  = type === 'kickoff' ? kickoff(name,company,client,contact) : weekly(name,company,client,contact,prep);
   const label   = type === 'kickoff' ? 'Kickoff Meeting' : 'Weekly Status Call';
+  const live    = type === 'weekly' && hasPrep(prep);
 
-  let html = `<div class="client-tag">${client} &mdash; ${label}</div>
-  <div class="leg">
-    <div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>
-    <div class="li"><div class="ld" style="background:#DDA820"></div>Fill in with current status</div>
-    <div class="li"><div class="ld" style="background:#CCC"></div>Coaching tip</div>
-  </div>`;
+  let html = '<div class="otag">' + client + ' &mdash; ' + label +
+    (live ? ' <span class="prep-badge">PREP APPLIED</span>' : '') + '</div>';
+
+  html += '<div class="leg">' +
+    '<div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>' +
+    '<div class="li"><div class="ld" style="background:#DDA820"></div>Fill in</div>' +
+    (live ? '<div class="li"><div class="ld" style="background:#1F3A5F"></div>From your prep</div>' : '') +
+    '<div class="li"><div class="ld" style="background:#CCC"></div>Coaching tip</div>' +
+    '</div>';
 
   for (const ph of phases) {
-    html += `<div class="phase">
-      <div class="phd">
-        <span class="pl">Phase ${ph.num}</span>
-        <span class="pt">${ph.name}</span>
-        <span class="ptm">${ph.time}</span>
-      </div><div class="phb">`;
+    html += '<div class="phase"><div class="phd">' +
+      '<span class="pl">Phase ' + ph.num + '</span>' +
+      '<span class="ptit">' + ph.name + '</span>' +
+      '<span class="ptm">' + ph.time + '</span>' +
+      '</div><div class="phb">';
     for (const b of ph.blocks) {
-      const cls = b.t === 'rail' ? 'rail' : b.t === 'fill' ? 'fill' : 'tip';
-      const lc  = b.t === 'rail' ? 'blr'  : b.t === 'fill' ? 'blf'  : 'blt';
-      html += `<div class="${cls}"><div class="bl ${lc}">${b.lbl}</div>${b.text.replace(/\n/g,'<br>')}</div>`;
+      const cls = b.t==='rail' ? 'rail' : b.t==='fill' ? 'fill'+(b.live?' live':'') : 'tip';
+      const lc  = b.t==='rail' ? 'blr'  : b.t==='fill' ? (b.live?'bll':'blf') : 'blt';
+      html += '<div class="'+cls+'"><div class="bl '+lc+'">'+b.lbl+'</div>'+b.text.replace(/\n/g,'<br>')+'</div>';
     }
-    html += `</div></div>`;
+    html += '</div></div>';
   }
 
   const out = document.getElementById('output');
   out.innerHTML = html;
   out.className = 'script on';
   document.getElementById('printBtn').style.display = 'inline-block';
+  out.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 </script>
 </body>
