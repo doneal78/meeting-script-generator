@@ -289,56 +289,82 @@ const THR = [/\byou'?ll\b/i,/\byou will\b/i,/\byour (team|side|end)\b/i,/\bthe c
 function importCopilot(){
   const raw=document.getElementById('copilot-paste').value.trim();
   if(!raw){document.getElementById('emsg').textContent='Paste your Copilot output first.';return;}
+
+  // Normalize before parsing: unify all dash types, arrows, bullets
+  const norm=raw
+    .replace(/[\u2012\u2013\u2014\u2015\u2212]/g,'-')  // all dashes -> hyphen
+    .replace(/\u2022|\u2023|\u25e6|\u2043/g,'*')         // all bullets -> *
+    .replace(/\u2192|\u27a1|->|=>/g,'>>');                // all arrows -> >>
+
   const company=v('yourCompany').toLowerCase().trim();
   const client=v('clientName').toLowerCase().trim();
-  const lines=raw.split('\n');
+  const lines=norm.split('\n');
   let cur=null,order=[],secs={};
-  for(const line of lines){
-    const t=line.trim(); if(!t) continue;
-    // strip markdown bold/italic/header markers
-    const c=t.replace(/^[*#_]+\s*|[*#_]+\s*$/g,'').trim();
-    // LAST CALL header - match any dash variant
-    const lc=c.match(/^LAST CALL\s*[-\u2013\u2014:]\s*(.+)$/i);
-    if(lc){cur='LC:'+lc[1].replace(/[*_]+$/,'').trim();order.push(cur);secs[cur]=[];continue;}
-    if(c.match(/^IN PROGRESS/i)){cur='PROG';secs['PROG']=[];continue;}
-    if(c.match(/^STATUS CONTEXT/i)){cur='CTX';secs['CTX']=[];continue;}
-    if(c.match(/^SKIP/i)){cur='SKIP';continue;} // SKIP: stop adding items
-    // bullet items - only when not in SKIP
-    if(cur&&cur!=='SKIP'&&(t[0]==='•'||t[0]==='*'||t[0]==='-')){
-      const tx=t.replace(/^[•*\-]\s*/,'').trim();
-      if(tx.length>5)(secs[cur]=secs[cur]||[]).push(tx);
+
+  for(let i=0;i<lines.length;i++){
+    const t=lines[i].trim(); if(!t) continue;
+    // Strip bold/italic/header markdown (** text ** or ## text)
+    const c=t.replace(/^\*{1,3}\s*|\s*\*{1,3}$/g,'').replace(/^#{1,3}\s*/,'').trim();
+
+    // Section header: LAST CALL - Company Name
+    const lcm=c.match(/^LAST CALL\s*[-:]\s*(.+)$/i);
+    if(lcm){cur='LC:'+lcm[1].replace(/\*+$/,'').trim();order.push(cur);secs[cur]=[];continue;}
+
+    if(c.match(/^IN PROGRESS/i)){cur='PROG';if(!secs[cur])secs[cur]=[];continue;}
+    if(c.match(/^STATUS CONTEXT/i)){cur='CTX';if(!secs[cur])secs[cur]=[];continue;}
+    if(c.match(/^SKIP/i)){cur='SKIP';continue;}  // SKIP: discard all following items
+
+    // Bullet items — only when in a valid (non-SKIP) section
+    if(cur&&cur!=='SKIP'){
+      const isBullet=t.startsWith('*')||t.startsWith('-')||t.startsWith('\u2022');
+      if(isBullet){
+        const tx=t.replace(/^[*\-\u2022]\s*/,'').trim();
+        if(tx.length>5){secs[cur]=secs[cur]||[];secs[cur].push(tx);}
+      }
     }
   }
+
+  // Route LAST CALL items to columns
   let lcN=0,prN=0,cxN=0;
   const lcK=Object.keys(secs).filter(k=>k.startsWith('LC:'));
   lcK.forEach((key,idx)=>{
     const nm=key.slice(3).toLowerCase();
-    const ours=(company&&nm.includes(company))?true:(client&&nm.includes(client))?false:idx===0;
+    // Word-based matching: does any significant word from the section name appear in company/client?
+    const words=nm.split(/\s+/).filter(w=>w.length>3);
+    const ours=words.some(w=>company.includes(w))?true:words.some(w=>client.includes(w))?false:idx===0;
     (secs[key]||[]).forEach(raw=>{
       let tx=raw,st='progress';
-      const sm=tx.match(/\s*[\u2192>]\s*(in progress|done|blocked|pushed)\s*$/i);
+      // Status: ">> done", ">> in progress", ">> blocked", ">> pushed"
+      const sm=tx.match(/\s*>>\s*(in progress|done|blocked|pushed)\s*$/i);
       if(sm){const s=sm[1].toLowerCase();if(s==='done')st='done';else if(s==='blocked')st='blocked';else if(s==='pushed')st='pushed';tx=tx.replace(sm[0],'').trim();}
       const it={id:nid(),text:tx,status:st};
-      if(ours)usItems.push(it);else themItems.push(it);
-      lcN++;
+      if(ours)usItems.push(it);else themItems.push(it);lcN++;
     });
   });
+
+  // Route IN PROGRESS to Step 3
   (secs['PROG']||[]).forEach(raw=>{
     let tx=raw,dt='';
-    const dm=tx.match(/\s*[-\u2013\u2014]\s*targeting\s+(.+?)\.?\s*$/i);
+    const dm=tx.match(/\s*-\s*targeting\s+(.+?)\.?\s*$/i);
     if(dm){dt=dm[1].trim();tx=tx.replace(dm[0],'').trim();}
     U.prog.push({id:nid(),item:tx,date:dt,action:'',owner:''});prN++;
   });
   if(prN)renderU('prog');
-  if(secs['CTX']&&secs['CTX'].length){const el=document.getElementById('status-context');if(el)el.value=secs['CTX'].join('\n');cxN=secs['CTX'].length;}
+
+  // Route STATUS CONTEXT to textarea
+  if(secs['CTX']&&secs['CTX'].length){
+    const el=document.getElementById('status-context');
+    if(el)el.value=secs['CTX'].join('\n');cxN=secs['CTX'].length;
+  }
+
   renderCols();refreshSummary();
-  document.getElementById('emsg').textContent=lcN>0||prN>0
-    ?`Imported: ${lcN} commitment${lcN!==1?'s':''} → columns${prN?', '+prN+' in-progress → status update':''}${cxN?', '+cxN+' context items → notes':''}.`
-    :'Nothing found — make sure the output has LAST CALL, IN PROGRESS, and STATUS CONTEXT sections.';
+  const msg=lcN>0||prN>0
+    ?`Imported: ${lcN} commitment${lcN!==1?'s':''} \u2192 columns${prN?', '+prN+' in-progress \u2192 status update':''}${cxN?', '+cxN+' context items \u2192 notes':''}.`
+    :'Nothing found \u2014 make sure the output includes LAST CALL \u2014 [company] and LAST CALL \u2014 [client] sections.';
+  document.getElementById('emsg').textContent=msg;
   document.getElementById('s2meta').textContent=`${lcN} commitment${lcN!==1?'s':''} imported`;
   if(!document.getElementById('s2').classList.contains('open'))tog('s2');
 }
-
 // ─── Commitment items ─────────────────────────────────────────────
 function renderCols(){
   renderCol('us-list', usItems, 'us');
