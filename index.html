@@ -6,449 +6,574 @@
 <title>Meeting Script Generator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F8F9FA;color:#1A1A1A;padding:24px;max-width:840px;margin:0 auto}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:#1A1A1A;padding:20px;max-width:880px;margin:0 auto}
 h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
-.sub{font-size:13px;color:#888;margin-bottom:16px}
-.card{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:16px 20px;margin-bottom:12px}
-.row-setup{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
-.fld label,.prep-lbl{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
-.fld input,.fld select,input.itext,input.idate,select.ism,textarea.ita{font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit}
-.fld input:focus,.fld select:focus,input.itext:focus,input.idate:focus,select.ism:focus,textarea.ita:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F;outline-offset:0}
-input.itext{flex:1;min-width:120px;width:100%}
-input.idate{width:130px;min-width:100px}
-select.ism{cursor:pointer}
-textarea.ita{width:100%;resize:vertical;min-height:56px;line-height:1.5}
+.sub{font-size:13px;color:#888;margin-bottom:20px}
 
-/* prep toggle */
-.prep-toggle{width:100%;padding:11px 20px;font-size:13px;font-weight:500;color:#1F3A5F;background:#F0F4F8;border:none;border-radius:10px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;margin-bottom:0}
-.prep-toggle:hover{background:#E4EEF7}
-.prep-body{padding:18px 20px;border-top:1px solid #E8E8E8;display:none}
-.prep-grp{margin-bottom:22px}
-.prep-grp:last-child{margin-bottom:0}
-.prep-grp-title{font-size:12px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #EEE}
-.prep-field{margin-bottom:10px}
-.drow{display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap}
-.rm{padding:4px 9px;font-size:14px;border-radius:5px;border:1px solid #E0E0E0;background:#fff;color:#AAA;cursor:pointer;flex-shrink:0;line-height:1}
-.rm:hover{background:#FEE2E2;border-color:#FCA5A5;color:#C33}
-.add-btn{padding:5px 13px;font-size:12px;border-radius:5px;border:1px dashed #BBB;background:#FAFAFA;color:#555;cursor:pointer;margin-top:2px}
-.add-btn:hover{background:#EEF4FF;border-color:#1F3A5F;color:#1F3A5F}
+/* Steps */
+.step{background:#fff;border:1px solid #DDE3EC;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.step-head{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none}
+.step-head:hover{background:#F8F9FB}
+.step-num{width:26px;height:26px;border-radius:50%;background:#1F3A5F;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:15px;font-weight:600;color:#1F3A5F;flex:1}
+.step-meta{font-size:12px;color:#888}
+.step-arrow{font-size:11px;color:#AAA;transition:transform 0.2s}
+.step.open .step-arrow{transform:rotate(90deg)}
+.step-body{display:none;padding:16px 18px;border-top:1px solid #EEF1F6}
+.step.open .step-body{display:block}
 
-/* buttons */
-.btn-row{display:flex;gap:8px;margin-bottom:20px}
-.gen-btn{padding:10px 22px;font-size:14px;font-weight:600;border-radius:7px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
-.gen-btn:hover{background:#2A4E82}
-.print-btn{padding:10px 16px;font-size:13px;font-weight:500;border-radius:7px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none}
-.print-btn:hover{background:#F0F0F0}
+/* Form */
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.fld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+.fld label{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.06em}
+.fld input,.fld select{font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit;width:100%}
+.fld input:focus,.fld select:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
 
-/* output */
-.script{display:none}.script.on{display:block}
-.otag{display:inline-flex;align-items:center;gap:8px;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:5px;padding:4px 12px;font-size:12px;color:#1F3A5F;font-weight:500;margin-bottom:14px}
-.prep-badge{background:#1F3A5F;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.04em}
+/* Transcript */
+.transcript-area{width:100%;min-height:110px;font-size:12px;font-family:inherit;padding:10px;border:1px solid #CCC;border-radius:6px;resize:vertical;background:#FAFAFA;color:#333;line-height:1.55;margin-bottom:8px}
+.transcript-area:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F;background:#fff}
+
+/* Buttons */
+.btn{padding:8px 16px;font-size:13px;font-weight:600;border-radius:6px;border:none;cursor:pointer;font-family:inherit}
+.btn-extract{background:#4A3F6B;color:#fff}
+.btn-extract:hover{background:#5C508A}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/* Commitment columns */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.col-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding-bottom:6px;border-bottom:2px solid #EEF1F6;margin-bottom:8px}
+.col-lbl.us{color:#0F6E56;border-color:#3DAA88}
+.col-lbl.them{color:#8B5000;border-color:#DDA820}
+.icard{background:#F8F9FB;border:1px solid #E5E9F0;border-radius:6px;padding:8px 10px;margin-bottom:6px}
+.itext{font-size:13px;line-height:1.45;color:#1A1A1A;margin-bottom:7px;border-radius:3px;min-height:18px;outline:none;cursor:text}
+.itext:focus{background:#EEF6FF;box-shadow:0 0 0 2px #1F3A5F;padding:2px 4px}
+.srow{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.sbtn{font-size:11px;font-weight:500;padding:3px 8px;border-radius:12px;border:1px solid transparent;cursor:pointer;background:#E8ECF2;color:#555;font-family:inherit}
+.sbtn:hover{background:#D5DBE8}
+.s-done{background:#D4EDDA!important;color:#155724!important;border-color:#C3E6CB!important}
+.s-prog{background:#FFF3CD!important;color:#856404!important;border-color:#FFEEBA!important}
+.s-blkd{background:#F8D7DA!important;color:#721C24!important;border-color:#F5C6CB!important}
+.s-push{background:#E8ECF2!important;color:#444!important;border-color:#CED4DA!important}
+.idel{margin-left:auto;font-size:12px;color:#CCC;cursor:pointer;padding:2px 5px;border:none;background:none;font-family:inherit;border-radius:3px}
+.idel:hover{color:#C0392B;background:#FDF0EF}
+.add-btn{width:100%;font-size:12px;color:#1F3A5F;background:none;border:1px dashed #B0BEC5;border-radius:6px;padding:6px;cursor:pointer;margin-top:4px;font-family:inherit}
+.add-btn:hover{background:#EEF1F6;border-color:#1F3A5F}
+.empty-note{font-size:12px;color:#BBB;font-style:italic;padding:6px 0}
+
+/* Step 3 update rows */
+.section3{margin-bottom:16px}
+.s3-lbl{font-size:12px;font-weight:700;color:#1F3A5F;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.d-green{background:#3DAA88}
+.d-amber{background:#DDA820}
+.d-red{background:#E74C3C}
+.d-blue{background:#2E86AB}
+.d-navy{background:#1F3A5F}
+.urow{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.urow input{flex:1;font-size:13px;padding:6px 9px;border:1px solid #CCC;border-radius:5px;font-family:inherit;background:#fff;color:#1A1A1A}
+.urow input:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
+.urow input.narrow{max-width:130px}
+.udel{background:none;border:none;color:#CCC;cursor:pointer;font-size:16px;padding:2px 5px;line-height:1;font-family:inherit}
+.udel:hover{color:#E74C3C}
+
+/* Summary bar */
+.sumbar{background:#EEF1F6;border-radius:8px;padding:10px 16px;margin:12px 0;display:none;flex-wrap:wrap;gap:16px;font-size:12px;color:#555;align-items:center}
+.sitem{display:flex;align-items:center;gap:5px}
+.scount{font-weight:700;color:#1A1A1A}
+
+/* Generate row */
+.gen-row{display:flex;gap:10px;margin:8px 0 20px;align-items:center;flex-wrap:wrap}
+.genbtn{padding:12px 28px;font-size:14px;font-weight:700;border-radius:8px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
+.genbtn:hover{background:#2E5080}
+.printbtn{padding:10px 16px;font-size:13px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none;font-family:inherit}
+.printbtn:hover{background:#F0F0F0}
+
+/* Script output */
+.script-out{display:none}
+.script-out.on{display:block}
+.client-tag{display:inline-block;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:4px;padding:3px 10px;font-size:12px;color:#1F3A5F;font-weight:600;margin-bottom:12px}
 .leg{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
-.li{display:flex;align-items:center;gap:6px;font-size:12px;color:#666}
-.ld{width:12px;height:4px;border-radius:2px}
-.phase{margin-bottom:12px;border:1px solid #E0E0E0;border-radius:8px;overflow:hidden}
-.phd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#EEF2F7}
-.pl{font-size:10px;font-weight:700;color:#888;background:#fff;border:1px solid #D0D0D0;padding:2px 7px;border-radius:3px}
-.ptit{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
-.ptm{font-size:11px;color:#999}
+.li{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
+.ld{width:12px;height:3px;border-radius:2px}
+.phase{margin-bottom:10px;border:1px solid #DDE3EC;border-radius:8px;overflow:hidden}
+.phd{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#EEF1F6}
+.pnum{font-size:10px;font-weight:600;color:#666;background:#fff;border:1px solid #CCC;padding:2px 7px;border-radius:3px}
+.pname{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
+.ptime{font-size:11px;color:#888}
 .phb{padding:12px 14px;background:#fff}
-.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:13px;line-height:1.7;color:#1A1A1A}
-.fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:13px;line-height:1.7;color:#1A1A1A}
-.live{border-left-color:#1F3A5F!important;background:#EEF2F7!important}
-.tip{border-left:3px solid #DDD;background:#F5F5F5;padding:8px 12px;border-radius:0 5px 5px 0;margin-bottom:9px;font-size:12px;line-height:1.6;color:#666}
+.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.fill.hot{border-left-color:#E67E22;background:#FEF3E2}
+.tip{border-left:3px solid #CCC;background:#F5F5F5;padding:8px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:12px;line-height:1.6;color:#555}
 .bl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.blr{color:#0F6E56}.blf{color:#8B5000}.bll{color:#1F3A5F}.blt{color:#999}
+.blr{color:#0F6E56}.blf{color:#8B5000}.blt{color:#888}.blh{color:#C0560A}
+.bdone{color:#155724;background:#D4EDDA;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.bprog{color:#856404;background:#FFF3CD;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.bblkd{color:#721C24;background:#F8D7DA;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.bpush{color:#444;background:#E8ECF2;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.extract-msg{font-size:12px;color:#666;margin-left:10px;font-style:italic}
 
+@media(max-width:580px){.cols{grid-template-columns:1fr}}
 @media print{
-  body{background:#fff;padding:12px;max-width:100%}
-  .card,.prep-toggle,.prep-body,.btn-row{display:none!important}
-  .script{display:block!important}
+  body{background:#fff;padding:8px;max-width:100%}
+  .step,.sumbar,.gen-row,.printbtn,.genbtn{display:none!important}
+  .script-out{display:block!important}
   .phase{break-inside:avoid}
+  h1,.sub{display:none}
 }
 </style>
 </head>
 <body>
 
 <h1>Meeting Script Generator</h1>
-<p class="sub">Security Services &mdash; fill in your details, add meeting prep, and generate a ready-to-drill script.</p>
+<p class="sub">Security Services &mdash; prep your call, review last week, and generate a ready-to-deliver script.</p>
 
-<!-- SETUP -->
-<div class="card">
-  <div class="row-setup">
-    <div class="fld"><label>Your name</label><input type="text" id="yourName" placeholder="e.g. David" /></div>
-    <div class="fld"><label>Your company</label><input type="text" id="yourCompany" placeholder="e.g. Acme Security" /></div>
-    <div class="fld"><label>Client name</label><input type="text" id="clientName" placeholder="e.g. Coatue" /></div>
-    <div class="fld"><label>Primary contact</label><input type="text" id="contactName" placeholder="e.g. Sarah" /></div>
-    <div class="fld">
-      <label>Meeting type</label>
-      <select id="meetingType" onchange="onTypeChange()">
-        <option value="weekly">Weekly Status Call</option>
-        <option value="kickoff">Kickoff Meeting</option>
-      </select>
+<!-- ── STEP 1 ────────────────────────────────────────────────────── -->
+<div class="step open" id="s1">
+  <div class="step-head" onclick="tog('s1')">
+    <div class="step-num">1</div>
+    <div class="step-title">Your Details</div>
+    <div class="step-meta" id="s1meta"></div>
+    <div class="step-arrow">&#9654;</div>
+  </div>
+  <div class="step-body">
+    <div class="row">
+      <div class="fld"><label>Your name</label><input id="yourName" placeholder="e.g. David" oninput="refreshMeta()"/></div>
+      <div class="fld"><label>Your company</label><input id="yourCompany" placeholder="e.g. Acme Security" /></div>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Client name</label><input id="clientName" placeholder="e.g. Coatue" oninput="refreshMeta()"/></div>
+      <div class="fld"><label>Primary contact</label><input id="contactName" placeholder="e.g. Max" /></div>
+      <div class="fld"><label>Meeting type</label>
+        <select id="meetingType">
+          <option value="weekly">Weekly Status Call</option>
+          <option value="kickoff">Kickoff Meeting</option>
+        </select>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- PREP TOGGLE -->
-<div class="card" style="padding:0;overflow:hidden">
-  <button class="prep-toggle" id="prepToggleBtn" onclick="togglePrep()">
-    <span id="prepArrow" style="font-size:11px">▶</span>
-    <span>Meeting prep</span>
-    <span style="font-weight:400;color:#999;font-size:12px">&nbsp;— optional &nbsp;·&nbsp; fills in the script automatically</span>
-  </button>
-  <div class="prep-body" id="prepBody">
+<!-- ── STEP 2 ────────────────────────────────────────────────────── -->
+<div class="step" id="s2">
+  <div class="step-head" onclick="tog('s2')">
+    <div class="step-num">2</div>
+    <div class="step-title">Last Call Review</div>
+    <div class="step-meta" id="s2meta">Paste transcript to pull out commitments</div>
+    <div class="step-arrow">&#9654;</div>
+  </div>
+  <div class="step-body">
+    <div class="fld" style="margin-bottom:8px">
+      <label>Paste last week&rsquo;s transcript or meeting notes</label>
+      <textarea id="transcript" class="transcript-area"
+        placeholder="Paste the full transcript or your notes here. The tool scans for action items, commitments, and follow-ups made by both sides — then lets you mark each one as done, in progress, blocked, or pushed."></textarea>
+    </div>
+    <button class="btn btn-extract btn-sm" onclick="extract()">&#128269; Extract commitments</button>
+    <span class="extract-msg" id="emsg"></span>
 
-    <!-- WEEKLY PREP -->
-    <div id="weeklyPrep">
-
-      <div class="prep-grp">
-        <div class="prep-grp-title">Last week's commitments</div>
-        <div id="aiRows"></div>
-        <button class="add-btn" onclick="addAI()">+ Add item</button>
+    <div class="cols">
+      <div>
+        <div class="col-lbl us">&#128100; Our commitments</div>
+        <div id="us-list"></div>
+        <button class="add-btn" onclick="addItem('us')">+ Add commitment</button>
       </div>
-
-      <div class="prep-grp">
-        <div class="prep-grp-title">This week's status</div>
-        <div class="prep-field">
-          <span class="prep-lbl">✓ &nbsp;Wins — what got done since last call</span>
-          <textarea class="ita" id="wins" placeholder="e.g. Baseline analysis sent to client. Ryan resolved the partial record failures."></textarea>
-        </div>
-        <div class="prep-field">
-          <span class="prep-lbl">→ &nbsp;In progress (item + expected date)</span>
-          <div id="ipRows"></div>
-          <button class="add-btn" onclick="addIP()">+ Add item</button>
-        </div>
-        <div class="prep-field">
-          <span class="prep-lbl">⚠ &nbsp;Flags to raise (concern + what you're doing about it)</span>
-          <div id="flagRows"></div>
-          <button class="add-btn" onclick="addFlag()">+ Add flag</button>
-        </div>
+      <div>
+        <div class="col-lbl them">&#128101; Their commitments</div>
+        <div id="them-list"></div>
+        <button class="add-btn" onclick="addItem('them')">+ Add commitment</button>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="prep-grp">
-        <div class="prep-grp-title">What you need from them</div>
-        <div id="needRows"></div>
-        <button class="add-btn" onclick="addNeed()">+ Add item</button>
-      </div>
+<!-- ── STEP 3 ────────────────────────────────────────────────────── -->
+<div class="step" id="s3">
+  <div class="step-head" onclick="tog('s3')">
+    <div class="step-num">3</div>
+    <div class="step-title">This Week&rsquo;s Updates</div>
+    <div class="step-meta" id="s3meta">Fill in your status updates</div>
+    <div class="step-arrow">&#9654;</div>
+  </div>
+  <div class="step-body">
 
-      <div class="prep-grp">
-        <div class="prep-grp-title">Next call action items</div>
-        <div id="nsRows"></div>
-        <button class="add-btn" onclick="addNS()">+ Add item</button>
-      </div>
-
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-green"></span>Wins &amp; completed items</div>
+      <div id="wins-list"></div>
+      <button class="add-btn" onclick="addU('wins')">+ Add win</button>
     </div>
 
-    <!-- KICKOFF PREP -->
-    <div id="kickoffPrep" style="display:none">
-      <div class="prep-grp">
-        <div class="prep-grp-title">Pre-call context</div>
-        <div class="prep-field">
-          <span class="prep-lbl">Tools being onboarded</span>
-          <input type="text" class="itext" id="koTools" placeholder="e.g. Sumo Logic SIEM, CrowdStrike EDR" />
-        </div>
-        <div class="prep-field">
-          <span class="prep-lbl">Key stakeholders on their side</span>
-          <input type="text" class="itext" id="koStakeholders" placeholder="e.g. Sarah (CISO), Eric (IT Admin), Patrick (SOC)" />
-        </div>
-        <div class="prep-field">
-          <span class="prep-lbl">Anything specific to cover or address</span>
-          <textarea class="ita" id="koNotes" placeholder="e.g. Client has concerns about shared accounts. Confirm access process with Eric."></textarea>
-        </div>
-      </div>
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-amber"></span>In progress <span style="font-weight:400;color:#888">(add expected completion date)</span></div>
+      <div id="prog-list"></div>
+      <button class="add-btn" onclick="addU('prog')">+ Add in-progress item</button>
+    </div>
+
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-red"></span>Flags or concerns <span style="font-weight:400;color:#888">(include what you&rsquo;re doing about it)</span></div>
+      <div id="flags-list"></div>
+      <button class="add-btn" onclick="addU('flags')">+ Add flag</button>
+    </div>
+
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-blue"></span>What I need from the client <span style="font-weight:400;color:#888">(include date)</span></div>
+      <div id="needs-list"></div>
+      <button class="add-btn" onclick="addU('needs')">+ Add ask</button>
+    </div>
+
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-navy"></span>New action items for next call <span style="font-weight:400;color:#888">(owner + date)</span></div>
+      <div id="next-list"></div>
+      <button class="add-btn" onclick="addU('next')">+ Add action item</button>
     </div>
 
   </div>
 </div>
 
-<!-- BUTTONS -->
-<div class="btn-row">
-  <button class="gen-btn" onclick="generate()">Generate script</button>
-  <button class="print-btn" id="printBtn" onclick="window.print()">&#128438; Print / Save as PDF</button>
+<!-- ── SUMMARY + GENERATE ─────────────────────────────────────────── -->
+<div class="sumbar" id="sumbar">
+  <div class="sitem"><div class="dot d-green"></div>Wins: <span class="scount" id="sc-wins">0</span></div>
+  <div class="sitem"><div class="dot d-amber"></div>In progress: <span class="scount" id="sc-prog">0</span></div>
+  <div class="sitem"><div class="dot d-red"></div>Flags: <span class="scount" id="sc-flags">0</span></div>
+  <div class="sitem"><div class="dot d-blue"></div>Client asks: <span class="scount" id="sc-needs">0</span></div>
+  <div class="sitem"><div class="dot d-navy"></div>Action items: <span class="scount" id="sc-next">0</span></div>
 </div>
 
-<!-- OUTPUT -->
-<div class="script" id="output"></div>
+<div class="gen-row">
+  <button class="genbtn" onclick="generate()">&#9654; Generate script</button>
+  <button class="printbtn" id="printbtn" onclick="window.print()">&#128438; Print / Save PDF</button>
+</div>
+
+<div class="script-out" id="output"></div>
 
 <script>
-// ── UI helpers ────────────────────────────────────────────────────────────
-function togglePrep() {
-  const b = document.getElementById('prepBody');
-  const open = b.style.display === 'none' || b.style.display === '';
-  b.style.display = open ? 'block' : 'none';
-  document.getElementById('prepArrow').textContent = open ? '▼' : '▶';
+// ─── State ────────────────────────────────────────────────────────
+let usItems=[], themItems=[], uid=0;
+const U = {wins:[], prog:[], flags:[], needs:[], next:[]};
+
+function nid(){ return ++uid; }
+
+// ─── Accordion ────────────────────────────────────────────────────
+function tog(id){
+  document.getElementById(id).classList.toggle('open');
 }
 
-function onTypeChange() {
-  const w = document.getElementById('meetingType').value === 'weekly';
-  document.getElementById('weeklyPrep').style.display = w ? 'block' : 'none';
-  document.getElementById('kickoffPrep').style.display = w ? 'none' : 'block';
+function refreshMeta(){
+  const n=v('yourName'), c=v('clientName');
+  document.getElementById('s1meta').textContent = (n&&c) ? n+' \u00B7 '+c : '';
 }
 
-function row(inner) {
-  const d = document.createElement('div');
-  d.className = 'drow';
-  d.innerHTML = inner + '<button class="rm" onclick="this.parentElement.remove()">&#215;</button>';
-  return d;
+function v(id){ return document.getElementById(id).value.trim(); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── Transcript extraction ────────────────────────────────────────
+const PAT = [
+  /\bI'?ll\b/i, /\bI will\b/i, /\bwe'?ll\b/i, /\bwe will\b/i,
+  /\bgoing to\b/i, /\baction item/i, /\bnext step/i, /\bfollow.?up\b/i,
+  /\bwill (send|check|confirm|get|look|reach|circle|schedule|set up|resend|follow|share|update)\b/i,
+  /\bby (next|end of|monday|tuesday|wednesday|thursday|friday|eod|eow|the end)\b/i,
+  /\bneed to\b/i, /\bget back to you\b/i, /\bcircle back\b/i,
+  /\bresend\b/i, /\blet (me|you) know\b/i, /\bstill owe\b/i,
+  /\bwaiting on\b/i, /\bcheck (with|on)\b/i, /\bconfirm\b/i,
+  /\bsend.{0,25}(over|you|email)\b/i, /\bshoot.{0,15}email\b/i,
+  /\bonce (I|we|he|she|they|you)\b/i, /\bpending\b/i
+];
+const OUR = [/\bI'?ll\b/i,/\bI will\b/i,/\bwe'?ll\b/i,/\bwe will\b/i,/\bI (sent|send|did|have|got|can)\b/i,/\bour (team|side|engineer|sock|soc)\b/i];
+const THR = [/\byou'?ll\b/i,/\byou will\b/i,/\byour (team|side|end)\b/i,/\bthe client\b/i,/\bon your end\b/i,/\bfrom your side\b/i];
+
+function extract(){
+  const raw = document.getElementById('transcript').value.trim();
+  if(!raw){ document.getElementById('emsg').textContent='Paste a transcript first.'; return; }
+  const lines = raw.split(/[\n.!?]/).map(l=>l.trim()).filter(l=>l.length>20 && l.length<280);
+  const hits = [...new Set(lines.filter(l=>PAT.some(p=>p.test(l))))].slice(0,22);
+  let added=0;
+  hits.forEach(raw=>{
+    const text = raw.replace(/^[-\u2022*\s]+/,'').replace(/^[A-Za-z ]{1,20}:\s*/,'').trim();
+    if(text.length < 15) return;
+    const isTheirs = THR.some(p=>p.test(text)) && !OUR.some(p=>p.test(text));
+    const item = {id:nid(), text, status:'progress'};
+    if(isTheirs) themItems.push(item); else usItems.push(item);
+    added++;
+  });
+  renderCols();
+  document.getElementById('emsg').textContent = added>0
+    ? `Found ${added} item${added!==1?'s':''} — review, edit statuses, then move to Step 3.`
+    : 'Nothing found automatically — add items manually using the buttons below.';
+  document.getElementById('s2meta').textContent = `${added} item${added!==1?'s':''} extracted`;
+  if(!document.getElementById('s2').classList.contains('open')) tog('s2');
 }
 
-function addAI() {
-  document.getElementById('aiRows').appendChild(row(
-    '<select class="ism" data-role="ai-owner"><option value="us">Our side</option><option value="client">Client side</option></select>' +
-    '<input type="text" class="itext" data-role="ai-text" placeholder="What was committed..." />' +
-    '<select class="ism" data-role="ai-status"><option value="done">✓ Done</option><option value="progress">→ In progress</option><option value="blocked">⚠ Blocked</option></select>'
-  ));
-}
-function addIP() {
-  document.getElementById('ipRows').appendChild(row(
-    '<input type="text" class="itext" data-role="ip-text" placeholder="What\'s in progress..." />' +
-    '<input type="text" class="idate" data-role="ip-date" placeholder="Expected by..." />'
-  ));
-}
-function addFlag() {
-  document.getElementById('flagRows').appendChild(row(
-    '<input type="text" class="itext" data-role="flag-text" placeholder="Concern to flag..." />' +
-    '<input type="text" class="itext" data-role="flag-action" placeholder="What we\'re doing about it..." />'
-  ));
-}
-function addNeed() {
-  document.getElementById('needRows').appendChild(row(
-    '<input type="text" class="itext" data-role="need-text" placeholder="What you need from them..." />' +
-    '<input type="text" class="idate" data-role="need-date" placeholder="By when..." />'
-  ));
-}
-function addNS() {
-  document.getElementById('nsRows').appendChild(row(
-    '<select class="ism" data-role="ns-owner"><option value="us">Me</option><option value="client">Client</option></select>' +
-    '<input type="text" class="itext" data-role="ns-text" placeholder="Action item..." />' +
-    '<input type="text" class="idate" data-role="ns-date" placeholder="By when..." />'
-  ));
+// ─── Commitment items ─────────────────────────────────────────────
+function renderCols(){
+  renderCol('us-list', usItems, 'us');
+  renderCol('them-list', themItems, 'them');
+  refreshSummary();
 }
 
-// ── Collect prep ──────────────────────────────────────────────────────────
-function vals(container, role) {
-  return [...document.querySelectorAll('#' + container + ' [data-role="' + role + '"]')]
-    .map(el => el.value.trim());
+function renderCol(elId, arr, side){
+  const el = document.getElementById(elId);
+  if(!arr.length){ el.innerHTML='<div class="empty-note">No items yet.</div>'; return; }
+  el.innerHTML = arr.map(it=>`
+    <div class="icard" id="ic${it.id}">
+      <div class="itext" contenteditable="true"
+           onblur="editItem(${it.id},'${side}',this)"
+           onfocus="selAll(this)">${esc(it.text)}</div>
+      <div class="srow">
+        ${[['done','&#10003; Done','s-done'],['progress','&#9203; In progress','s-prog'],['blocked','&#10007; Blocked','s-blkd'],['pushed','&rarr; Pushed','s-push']].map(([s,lbl,cls])=>
+          `<button class="sbtn${it.status===s?' '+cls:''}" onclick="setS(${it.id},'${side}','${s}')">${lbl}</button>`
+        ).join('')}
+        <button class="idel" onclick="delItem(${it.id},'${side}')">&#10005;</button>
+      </div>
+    </div>`).join('');
 }
 
-function getPrep() {
-  const aiText   = vals('aiRows','ai-text');
-  const aiOwner  = vals('aiRows','ai-owner');
-  const aiStatus = vals('aiRows','ai-status');
-  const actionItems = aiText.map((t,i) => ({text:t, owner:aiOwner[i], status:aiStatus[i]})).filter(i=>i.text);
+function selAll(el){ const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
 
-  const ipText = vals('ipRows','ip-text');
-  const ipDate = vals('ipRows','ip-date');
-  const inProgress = ipText.map((t,i) => ({text:t, date:ipDate[i]})).filter(i=>i.text);
-
-  const fText   = vals('flagRows','flag-text');
-  const fAction = vals('flagRows','flag-action');
-  const flags = fText.map((t,i) => ({text:t, action:fAction[i]})).filter(i=>i.text);
-
-  const nText = vals('needRows','need-text');
-  const nDate = vals('needRows','need-date');
-  const needs = nText.map((t,i) => ({text:t, date:nDate[i]})).filter(i=>i.text);
-
-  const nsOwner = vals('nsRows','ns-owner');
-  const nsText  = vals('nsRows','ns-text');
-  const nsDate  = vals('nsRows','ns-date');
-  const nextSteps = nsText.map((t,i) => ({text:t, owner:nsOwner[i], date:nsDate[i]})).filter(i=>i.text);
-
-  const wins = (document.getElementById('wins')||{}).value?.trim() || '';
-  return { actionItems, wins, inProgress, flags, needs, nextSteps };
+function addItem(side){
+  const item={id:nid(),text:'Click to edit',status:'progress'};
+  if(side==='us') usItems.push(item); else themItems.push(item);
+  renderCols();
+  setTimeout(()=>{ const c=document.getElementById('ic'+item.id); if(c){ const t=c.querySelector('.itext'); t.focus(); selAll(t); }},60);
 }
 
-function hasPrep(p) {
-  return p.actionItems.length || p.wins || p.inProgress.length || p.flags.length || p.needs.length || p.nextSteps.length;
+function editItem(id, side, el){
+  const arr = side==='us'?usItems:themItems;
+  const it = arr.find(i=>i.id===id);
+  if(it) it.text = el.innerText.trim();
+  refreshSummary();
 }
 
-// ── Build fill-in text from prep ──────────────────────────────────────────
-const SL = { done:'complete', progress:'still in progress', blocked:'blocked — flagging that now' };
-
-function p3text(prep, contact) {
-  const ai = prep.actionItems;
-  if (!ai.length) return null;
-  const us   = ai.filter(i=>i.owner==='us');
-  const them = ai.filter(i=>i.owner==='client');
-  const parts = [];
-  if (us.length)   parts.push('"From our side: '   + us.map(i=>i.text+' \u2014 '+(SL[i.status]||i.status)).join('; ') + '."');
-  if (them.length) parts.push('"From your side, ' + contact + ' \u2014 ' + them.map(i=>i.text+' \u2014 '+(SL[i.status]||i.status)).join('; ') + '."');
-  return parts.join('\n\n');
+function setS(id, side, status){
+  const arr = side==='us'?usItems:themItems;
+  const it = arr.find(i=>i.id===id);
+  if(it){ it.status=status; renderCols(); }
 }
 
-function p4text(prep, client) {
-  const { wins, inProgress, flags } = prep;
-  if (!wins && !inProgress.length && !flags.length) return null;
-  const parts = [];
-  if (wins) parts.push('"Good news first \u2014 ' + wins + '"');
-  inProgress.forEach(i => parts.push('"' + i.text + ' is in progress.' + (i.date ? ' Expected completion ' + i.date + '.' : '') + '"'));
-  flags.forEach(f => parts.push('"One thing I want to flag: ' + f.text + '.' + (f.action ? " Here\u2019s what we\u2019re doing about it: " + f.action + '.' : '') + ' I\u2019ll keep you posted."'));
-  return parts.join('\n\n');
+function delItem(id, side){
+  if(side==='us') usItems=usItems.filter(i=>i.id!==id);
+  else themItems=themItems.filter(i=>i.id!==id);
+  renderCols();
 }
 
-function p5text(prep) {
-  if (!prep.needs.length) return null;
-  return prep.needs.map(n => '"I need ' + n.text + (n.date ? ' by ' + n.date : '') + ' to stay on schedule."').join('\n\n');
+// ─── Step 3 update items ──────────────────────────────────────────
+const CFG = {
+  wins:  {ph:'What got done this week',           fields:['item']},
+  prog:  {ph:'What is in progress',               fields:['item','date'], dp:'Expected by...'},
+  flags: {ph:'Issue or concern',                  fields:['item','action'], ap:'What you\'re doing about it'},
+  needs: {ph:'What you need from the client',     fields:['item','date'], dp:'Need by...'},
+  next:  {ph:'Action item',                       fields:['item','owner','date'], op:'Owner', dp:'By date'}
+};
+
+function addU(type){
+  const id=nid();
+  U[type].push({id,item:'',date:'',action:'',owner:''});
+  renderU(type);
+  setTimeout(()=>{ const r=document.querySelector(`#${type}-list [data-id="${id}"] input`); if(r) r.focus(); },60);
 }
 
-function p6text(prep, contact, name) {
-  if (!prep.nextSteps.length) return null;
-  const list = prep.nextSteps.map(s =>
-    (s.owner==='us' ? name : contact) + ' will ' + s.text + (s.date ? ' by ' + s.date : '')
-  ).join('. ');
-  return '"' + list + '. Does anyone have additions or corrections?"';
+function delU(type, id){
+  U[type]=U[type].filter(i=>i.id!==id);
+  renderU(type);
+  refreshSummary();
 }
 
-// ── Block factory ─────────────────────────────────────────────────────────
-function B(t, lbl, text, live) { return {t, lbl, text: text||'', live:!!live}; }
-
-// ── Weekly script ─────────────────────────────────────────────────────────
-function weekly(name, company, client, contact, prep) {
-  const pp = hasPrep(prep);
-  const r3 = p3text(prep, contact);
-  const r4 = p4text(prep, client);
-  const r5 = p5text(prep);
-  const r6 = p6text(prep, contact, name);
-
-  return [
-    { num:1, name:'Opening', time:'~30 sec', blocks:[
-      B('rail','Memorize', '"Good [morning/afternoon], '+contact+' \u2014 '+name+' with '+company+'. Thanks for making time. Let\u2019s get into it."'),
-      B('tip','Note', 'Say '+contact+'\'s name before anything else. If others are on the call, acknowledge every name you see first.')
-    ]},
-    { num:2, name:'Agenda set', time:'~30 sec', blocks:[
-      B('rail','Memorize', '"Here\u2019s our plan today: action items from last week, current project and service status, anything that needs your attention, and next steps. Should take us about [X] minutes."'),
-      B('tip','Note', 'Never skip this line. 15 seconds \u2014 it signals you are organized and running the call. Every call, without exception.')
-    ]},
-    { num:3, name:'Action item review', time:'2\u20133 min', blocks:[
-      B('rail','Memorize', '"Before we get into today\u2019s update, let\u2019s check in on what we committed to last week."'),
-      r3 ? B('fill','From your prep', r3, true)
-         : B('fill','Fill in \u2014 check status before the call', '"From our side: [Item 1] \u2014 [status]. [Item 2] \u2014 [status].\n\nFrom your side \u2014 '+contact+', you were going to [do X]. Did you get a chance to get into that?"'),
-      ...(!r3 ? [
-        B('rail','Memorize \u2014 if all items are closed', '"Everything from last week is resolved \u2014 clean slate heading into today\u2019s update."'),
-        B('rail','Memorize \u2014 if items remain open', '"We have [#] items still in progress. I\u2019ll note those as we go and make sure they\u2019re captured in today\u2019s action items."'),
-      ] : []),
-      B('tip','Tip', '"I believe I sent it" is not a status update. Check the ticket and notes before this call starts.')
-    ]},
-    { num:4, name:'Status update', time:'5\u201310 min', blocks:[
-      B('rail','Memorize', '"Alright \u2014 here\u2019s where things stand."'),
-      r4 ? B('fill','From your prep', r4, true)
-         : B('fill','Fill in \u2014 wins \u2192 progress \u2192 concerns', 'Good news first: "[Completed item] \u2014 solid milestone for '+client+'."\n\nIn progress: "[Item] is on track / slightly behind. Expected completion [date]."\n\nFlagging a concern: "One thing I want to flag: [issue]. Here\u2019s what we\u2019re doing about it: [action]. I\u2019ll keep you posted."'),
-      B('tip','Tip', 'Every in-progress item needs a date or next checkpoint. Lead with good news \u2014 it keeps the call calm even when there are concerns.')
-    ]},
-    { num:5, name:'Needs from client', time:'2 min', blocks:[
-      B('rail','Memorize', '"Before we get to next steps \u2014 there are a couple of things I need from your side to keep us moving."'),
-      r5 ? B('fill','From your prep', r5, true)
-         : B('fill','Fill in \u2014 specific asks with dates', '"I need [specific item] by [specific date] to stay on schedule.\n\n[Other item] \u2014 that one\u2019s on us; you\u2019ll have it by [date]."'),
-      B('rail','Memorize \u2014 if no blockers', '"Nothing blocking us from '+client+'\u2019s side right now \u2014 we\u2019re clear to keep driving forward."'),
-      B('tip','Tip', '"Whenever you can" will never happen. Every ask needs a specific date. Name who on their team owns it.')
-    ]},
-    { num:6, name:'Next steps', time:'2 min', blocks:[
-      B('rail','Memorize', '"Before we close \u2014 let\u2019s lock in what happens next and who owns what."'),
-      r6 ? B('fill','From your prep', r6, true)
-         : B('fill','Memorize \u2014 read back out loud', '"'+name+' will [item] by [date]. '+contact+' will [item] by [date]. Does anyone have additions or corrections?"'),
-      B('tip','Tip', 'Say it out loud on the call \u2014 not just in your notes. Reading action items back is what separates meetings that produce results from ones that don\u2019t.')
-    ]},
-    { num:7, name:'Close', time:'~30 sec', blocks:[
-      B('rail','Memorize', '"That wraps us up. I\u2019ll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks '+contact+' \u2014 appreciate your time."'),
-      B('tip','Tip', 'Give a specific time for the recap \u2014 not "I\u2019ll send something later." That follow-up is proof you ran a tight meeting. Send it fast.')
-    ]}
-  ];
+function updF(type, id, field, val){
+  const it=U[type].find(i=>i.id===id);
+  if(it){ it[field]=val; refreshSummary(); }
 }
 
-// ── Kickoff script ────────────────────────────────────────────────────────
-function kickoff(name, company, client, contact) {
-  const tools = (document.getElementById('koTools')||{}).value?.trim() || '';
-  const stak  = (document.getElementById('koStakeholders')||{}).value?.trim() || '';
-  const notes = (document.getElementById('koNotes')||{}).value?.trim() || '';
-
-  return [
-    { num:1, name:'Opening + welcome', time:'~2 min', blocks:[
-      B('rail','Memorize', '"Good [morning/afternoon], everyone \u2014 '+name+', project manager at '+company+'. Really glad to have you all on and welcome to '+company+'. Let\u2019s make the most of the next [X] minutes."'),
-      stak ? B('fill','From your prep', 'Acknowledge these stakeholders as they join: '+stak+'.', true)
-           : B('fill','Fill in \u2014 welcome attendees', 'Welcome all '+client+' attendees by name as you see them join. Once introductions are complete: "I\u2019ll turn it over to [Technical Lead] for a brief intro, and then we\u2019ll get into the agenda."'),
-      B('tip','Tip', 'State your full name and role clearly \u2014 first call, they are still learning who is who. Slower and clearer than your weekly cadence.')
-    ]},
-    { num:2, name:'Team introductions', time:'~3 min', blocks:[
-      B('rail','Memorize \u2014 your side', '"On our side: I\u2019m '+name+', your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members will be introduced as we move through each project phase."'),
-      B('fill','Fill in \u2014 invite client side', 'After your team\u2019s intros, invite '+client+' to introduce their team: "I\u2019d love to have everyone on your side do a quick intro \u2014 name, role, and anything specific you\u2019re hoping to get out of today."'),
-      B('tip','Tip', 'Listen carefully. Note who is technical vs. executive \u2014 it shapes how you communicate for the rest of the project.')
-    ]},
-    { num:3, name:'Agenda overview', time:'~1 min', blocks:[
-      B('rail','Memorize', '"Here\u2019s our plan for today: overview of '+company+' and service scope, implementation milestones, how you\u2019ll track project progress, and clear next steps. The goal is to leave today with a shared picture of where we\u2019re headed and exactly what happens after this call."')
-    ]},
-    { num:4, name:'Company overview + scope', time:'~5 min', blocks:[
-      B('rail','Memorize \u2014 lead-in', '"Quick overview of who '+company+' is and how we\u2019ll work together \u2014 then we\u2019ll get into your specific project."'),
-      B('fill','Fill in \u2014 five key points', (tools ? 'Tools being onboarded: '+tools+'.\n\n' : '') +
-        '1. We are a 24/7 managed security services provider \u2014 extend '+client+'\u2019s team, not replace it.\n' +
-        '2. Core service: SOC as a service \u2014 continuous monitoring, triage, escalation, response.\n' +
-        '3. Workflow: alerts from your tools \u2192 enrichment and triage \u2192 our analysts investigate \u2192 escalate to you only when it matters.\n' +
-        '4. Communication: [ticketing system] for escalations, [project tracker] for onboarding progress, weekly calls for status.\n' +
-        '5. \u201cLive\u201d means: SOC actively monitoring, your team only called for things that need your attention.', !!tools),
-      notes ? B('fill','Pre-call notes to address', notes, true) : null,
-      B('tip','Tip', 'Hand off technical details to your technical lead: "[Technical Lead], I\u2019ll bring you in here." You own the process; they own the depth.')
-    ].filter(Boolean)},
-    { num:5, name:'Implementation milestones', time:'~5 min', blocks:[
-      B('rail','Memorize \u2014 lead-in', '"Here\u2019s how the project is structured from today through go-live. I\u2019ll share my screen and walk you through it."'),
-      B('fill','Fill in \u2014 walk your project tracker', 'Share your project tracker and walk through each phase:\n\u2022 Kickoff (today) \u2014 plan live, weekly cadence set, questionnaire sent\n\u2022 Discovery \u2014 questionnaire returned, access provisioned\n\u2022 Configure + Ingest \u2014 log sources confirmed, SLA finalized, automation tools connected\n\u2022 Baseline Review \u2014 detection engineering review, gap analysis\n\u2022 SOC Meet and Greet \u2014 SOC team introduction\n\u2022 Go-Live \u2014 SOC confirms live monitoring, project closes\n\nEstimated end date: [from your tracker].'),
-      B('tip','Tip', 'Know the end date before sharing your screen. Navigate directly \u2014 do not search around while they are watching.')
-    ]},
-    { num:6, name:'Next steps + questionnaire', time:'~5 min', blocks:[
-      B('rail','Memorize', '"Before we close \u2014 here\u2019s exactly what happens after this call."'),
-      B('fill','Fill in \u2014 confirm each item', '1. Follow-up email from me within the hour: kickoff deck, onboarding questionnaire, access sheet listing who from our team needs access to which '+client+' tools, and available times for your weekly standing call.\n\n2. Questionnaire: fill out what you can quickly over the next week or two. If something takes months to gather, skip it \u2014 we\u2019ll revisit as we go.\n\n3. Weekly cadence: proposing [day] at [time]. Does that work for everyone?'),
-      B('tip','Tip', 'Get ahead of questionnaire hesitation: "Fill out what you can quickly. Anything that takes more than a week to track down, we\u2019ll discuss as we get into the project." Removes the anxiety.')
-    ]},
-    { num:7, name:'Questions + close', time:'~5 min', blocks:[
-      B('rail','Memorize \u2014 open floor', '"Before we wrap up \u2014 any questions on what we covered, or anything you\u2019d like us to go back over?"'),
-      B('rail','Memorize \u2014 close', '"That wraps up our kickoff. Really excited to be working with '+client+' \u2014 you\u2019re in good hands. Watch for my email within the hour. '+contact+', if anything comes up before our first weekly call, my inbox is always open. Thanks everyone \u2014 great meeting."'),
-      B('tip','Tip', 'End with energy. First impression \u2014 the whole team is watching. Forward-looking, specific follow-up commitment, genuinely warm. Never trail off on a kickoff.')
-    ]}
-  ];
+function renderU(type){
+  const el=document.getElementById(type+'-list');
+  const cfg=CFG[type]; const arr=U[type];
+  if(!arr.length){ el.innerHTML=''; return; }
+  el.innerHTML=arr.map(it=>`
+    <div class="urow" data-id="${it.id}">
+      <input placeholder="${cfg.ph}" value="${esc(it.item)}" oninput="updF('${type}',${it.id},'item',this.value)"/>
+      ${cfg.fields.includes('date')?`<input class="narrow" placeholder="${cfg.dp||'Date'}" value="${esc(it.date)}" oninput="updF('${type}',${it.id},'date',this.value)"/>`:''}
+      ${cfg.fields.includes('action')?`<input placeholder="${cfg.ap||'Action'}" value="${esc(it.action)}" oninput="updF('${type}',${it.id},'action',this.value)"/>`:''}
+      ${cfg.fields.includes('owner')?`<input class="narrow" placeholder="${cfg.op||'Owner'}" value="${esc(it.owner)}" oninput="updF('${type}',${it.id},'owner',this.value)"/>`:''}
+      <button class="udel" onclick="delU('${type}',${it.id})">&#10005;</button>
+    </div>`).join('');
+  refreshSummary();
 }
 
-// ── Render ────────────────────────────────────────────────────────────────
-function generate() {
-  const name    = document.getElementById('yourName').value.trim()    || '[Your Name]';
-  const company = document.getElementById('yourCompany').value.trim() || '[Your Company]';
-  const client  = document.getElementById('clientName').value.trim()  || 'Client';
-  const contact = document.getElementById('contactName').value.trim() || 'Team';
+// ─── Summary bar ──────────────────────────────────────────────────
+function refreshSummary(){
+  const c={
+    wins: U.wins.filter(i=>i.item).length,
+    prog: U.prog.filter(i=>i.item).length,
+    flags:U.flags.filter(i=>i.item).length,
+    needs:U.needs.filter(i=>i.item).length,
+    next: U.next.filter(i=>i.item).length
+  };
+  const total=Object.values(c).reduce((a,b)=>a+b,0)+(usItems.length+themItems.length);
+  const bar=document.getElementById('sumbar');
+  bar.style.display=total>0?'flex':'none';
+  document.getElementById('sc-wins').textContent=c.wins;
+  document.getElementById('sc-prog').textContent=c.prog;
+  document.getElementById('sc-flags').textContent=c.flags;
+  document.getElementById('sc-needs').textContent=c.needs;
+  document.getElementById('sc-next').textContent=c.next;
+  document.getElementById('s3meta').textContent=total>0?`${total} update${total!==1?'s':''} ready`:'Fill in your status updates';
+}
+
+// ─── Badges ───────────────────────────────────────────────────────
+function bdg(s){
+  if(s==='done') return '<span class="bdone">&#10003; Done</span>';
+  if(s==='progress') return '<span class="bprog">&#9203; In progress</span>';
+  if(s==='blocked') return '<span class="bblkd">&#10007; Blocked</span>';
+  return '<span class="bpush">&rarr; Pushed</span>';
+}
+
+// ─── Build fill-in content ────────────────────────────────────────
+function buildReview(contact){
+  if(!usItems.length && !themItems.length)
+    return { text:`"From our side: [Item 1] &mdash; [status]. [Item 2] &mdash; [status].<br><br>From ${contact}'s side &mdash; you were going to [do X]. Did you get a chance to get into that?"`, hot:false };
+  const u=usItems.map(i=>`&bull; ${esc(i.text)} &mdash; ${bdg(i.status)}`).join('<br>');
+  const t=themItems.map(i=>`&bull; ${esc(i.text)} &mdash; ${bdg(i.status)}`).join('<br>');
+  let out='';
+  if(usItems.length) out+=`<strong>Our side:</strong><br>${u}`;
+  if(usItems.length&&themItems.length) out+='<br><br>';
+  if(themItems.length) out+=`<strong>${esc(contact)}'s side:</strong><br>${t}`;
+  return {text:out, hot:true};
+}
+
+function buildStatus(client){
+  const w=U.wins.filter(i=>i.item), p=U.prog.filter(i=>i.item), f=U.flags.filter(i=>i.item);
+  if(!w.length&&!p.length&&!f.length)
+    return {text:`Good news first: "[Completed item] &mdash; good milestone for ${esc(client)}."<br><br>In progress: "[Item] &mdash; expected completion [date]."<br><br>Flagging: "One thing I want to flag: [issue]. Here's what we're doing: [action]."`, hot:false};
+  const parts=[];
+  if(w.length) parts.push('<strong>Wins:</strong><br>'+w.map(i=>`&bull; ${esc(i.item)}`).join('<br>'));
+  if(p.length) parts.push('<strong>In progress:</strong><br>'+p.map(i=>`&bull; ${esc(i.item)}${i.date?' &mdash; targeting '+esc(i.date):''}`).join('<br>'));
+  if(f.length) parts.push('<strong>Flagging:</strong><br>'+f.map(i=>`&bull; ${esc(i.item)}${i.action?' &rarr; '+esc(i.action):''}`).join('<br>'));
+  return {text:parts.join('<br><br>'), hot:true};
+}
+
+function buildNeeds(){
+  const n=U.needs.filter(i=>i.item);
+  if(!n.length) return {text:'"I need [specific item] by [specific date] to stay on schedule."',hot:false};
+  return {text:n.map(i=>`"I need ${esc(i.item)}${i.date?' by '+esc(i.date):'.'}"`).join('<br><br>'), hot:true};
+}
+
+function buildNext(name, contact){
+  const ns=U.next.filter(i=>i.item);
+  const theirOpen=themItems.filter(i=>i.status==='progress'||i.status==='blocked');
+  if(!ns.length&&!theirOpen.length)
+    return {text:`"${esc(name)} will [item] by [date]. ${esc(contact)} will [item] by [date]. Anyone have additions?"`,hot:false};
+  const lines=[];
+  ns.forEach(i=>{ const own=i.owner||name; lines.push(`${esc(own)} will ${esc(i.item)}${i.date?' by '+esc(i.date):'.'}`); });
+  theirOpen.forEach(i=>lines.push(`${esc(contact)} &mdash; follow up on: ${esc(i.text)}`));
+  return {text:lines.join('<br>'), hot:true};
+}
+
+// ─── Phase builder ────────────────────────────────────────────────
+function ph(num, name, time, blocks){
+  const inner=blocks.map(b=>{
+    if(!b.type) return b.tip?`<div class="tip"><div class="bl blt">Tip</div>${b.tip}</div>`:'';
+    if(b.type==='rail') return `<div class="rail"><div class="bl blr">${b.lbl}</div>${b.text}</div>`;
+    const cls='fill'+(b.hot?' hot':'');
+    const lc=b.hot?'blh':'blf';
+    const lbl=b.hot?'From your prep &mdash; ready to deliver':'Fill in with current status';
+    return `<div class="${cls}"><div class="bl ${lc}">${lbl}</div>${b.text}</div>`;
+  }).join('');
+  return `<div class="phase"><div class="phd"><span class="pnum">Phase ${num}</span><span class="pname">${name}</span><span class="ptime">${time}</span></div><div class="phb">${inner}</div></div>`;
+}
+
+// ─── Generate ─────────────────────────────────────────────────────
+function generate(){
+  const name    = v('yourName')    || '[Your Name]';
+  const company = v('yourCompany') || '[Your Company]';
+  const client  = v('clientName')  || 'Client';
+  const contact = v('contactName') || 'Team';
   const type    = document.getElementById('meetingType').value;
-  const prep    = getPrep();
-  const phases  = type === 'kickoff' ? kickoff(name,company,client,contact) : weekly(name,company,client,contact,prep);
-  const label   = type === 'kickoff' ? 'Kickoff Meeting' : 'Weekly Status Call';
-  const live    = type === 'weekly' && hasPrep(prep);
 
-  let html = '<div class="otag">' + client + ' &mdash; ' + label +
-    (live ? ' <span class="prep-badge">PREP APPLIED</span>' : '') + '</div>';
+  const rev  = buildReview(contact);
+  const stat = buildStatus(client);
+  const need = buildNeeds();
+  const next = buildNext(name, contact);
 
-  html += '<div class="leg">' +
-    '<div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>' +
-    '<div class="li"><div class="ld" style="background:#DDA820"></div>Fill in</div>' +
-    (live ? '<div class="li"><div class="ld" style="background:#1F3A5F"></div>From your prep</div>' : '') +
-    '<div class="li"><div class="ld" style="background:#CCC"></div>Coaching tip</div>' +
-    '</div>';
+  let html=`<div class="client-tag">${esc(client)} &mdash; ${type==='kickoff'?'Kickoff Meeting':'Weekly Status Call'}</div>
+  <div class="leg">
+    <div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>
+    <div class="li"><div class="ld" style="background:#DDA820"></div>Fill in manually</div>
+    <div class="li"><div class="ld" style="background:#E67E22"></div>Pre-populated from your prep</div>
+    <div class="li"><div class="ld" style="background:#CCC"></div>Tip</div>
+  </div>`;
 
-  for (const ph of phases) {
-    html += '<div class="phase"><div class="phd">' +
-      '<span class="pl">Phase ' + ph.num + '</span>' +
-      '<span class="ptit">' + ph.name + '</span>' +
-      '<span class="ptm">' + ph.time + '</span>' +
-      '</div><div class="phb">';
-    for (const b of ph.blocks) {
-      const cls = b.t==='rail' ? 'rail' : b.t==='fill' ? 'fill'+(b.live?' live':'') : 'tip';
-      const lc  = b.t==='rail' ? 'blr'  : b.t==='fill' ? (b.live?'bll':'blf') : 'blt';
-      html += '<div class="'+cls+'"><div class="bl '+lc+'">'+b.lbl+'</div>'+b.text.replace(/\n/g,'<br>')+'</div>';
-    }
-    html += '</div></div>';
+  if(type==='kickoff'){
+    html += ph(1,'Opening + welcome','~2 min',[
+      {type:'rail',lbl:'Memorize',text:`"Good [morning/afternoon] everyone &mdash; ${esc(name)}, project manager at ${esc(company)}. Really glad to have you all on. Let's make the most of the next [X] minutes."`},
+      {type:null,tip:'State your full name and role clearly &mdash; this is the first call. Slower and more deliberate than your weekly cadence.'}
+    ]);
+    html += ph(2,'Team introductions','~3 min',[
+      {type:'rail',lbl:'Memorize &mdash; your side',text:`"On our side: I'm ${esc(name)}, your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members will be introduced as we move through the project."`},
+      {type:'fill',hot:false,text:`After your intro, invite ${esc(client)}: "I'd love to have everyone on your side do a quick intro &mdash; name, role, and anything specific you're hoping to get out of today."`},
+      {type:null,tip:'Listen carefully. Note who is technical vs. executive. This shapes how you communicate for the rest of the project.'}
+    ]);
+    html += ph(3,'Agenda overview','~1 min',[
+      {type:'rail',lbl:'Memorize',text:`"Here's our plan: overview of ${esc(company)} and service scope, implementation milestones, how you'll track project progress, and we'll close with clear next steps. Goal is to leave today aligned on where we're headed and what happens next."`}
+    ]);
+    html += ph(4,'Company overview + scope','~5 min',[
+      {type:'rail',lbl:'Memorize &mdash; lead-in',text:`"Quick overview of who ${esc(company)} is and how we'll work together &mdash; then we'll get into your specific project."`},
+      {type:'fill',hot:false,text:`1. 24/7 managed security services &mdash; goal is to extend ${esc(client)}'s team, not replace it.<br>2. Core service: SOC as a service &mdash; continuous monitoring, triage, escalation, response.<br>3. Workflow: alerts from your tools &rarr; enrichment &rarr; our analysts &rarr; escalation only when it matters.<br>4. Communication: [ticketing system] for escalations, [project tracker] for onboarding, weekly calls for status.<br>5. Live means: SOC monitoring 24/7, your team only gets called for what genuinely needs your attention.`},
+      {type:null,tip:'Hand off technical depth to your technical lead: "[Lead], I\'ll bring you in to walk through the workflow here." You own the process; they own the detail.'}
+    ]);
+    html += ph(5,'Implementation milestones','~5 min',[
+      {type:'rail',lbl:'Memorize',text:'"Here\'s how the project is structured from today through go-live. Let me share my screen."'},
+      {type:'fill',hot:false,text:'Walk your project tracker. Cover: Kickoff &rarr; Discovery &rarr; Configure + Ingest &rarr; Baseline Review &rarr; SOC Meet &amp; Greet &rarr; Go-Live.<br><br>Estimated end date: [from project tracker]. Factors that affect timing: questionnaire turnaround, access provisioning, log ingestion.'},
+      {type:null,tip:'Know the end date before you share your screen. Navigate directly to the right view &mdash; do not search around while they are watching.'}
+    ]);
+    html += ph(6,'Next steps','~5 min',[
+      {type:'rail',lbl:'Memorize',text:'"Before we close &mdash; here\'s exactly what happens after this call."'},
+      {type:'fill',hot:false,text:`1. Follow-up email within the hour: deck, questionnaire, access sheet, weekly call times.<br>2. Questionnaire: fill out what you can quickly. Anything that takes months &mdash; skip it for now.<br>3. Weekly cadence: proposing [day] at [time]. Does that work for everyone?`},
+      {type:'rail',lbl:'Memorize &mdash; close',text:`"That wraps up our kickoff. Really excited to be working with ${esc(client)} &mdash; you're in good hands. Watch for my email within the hour. ${esc(contact)}, if anything comes up before our first weekly call, my inbox is always open. Thanks everyone &mdash; great meeting."`}
+    ]);
+  } else {
+    html += ph(1,'Opening','~30 sec',[
+      {type:'rail',lbl:'Memorize',text:`"Good [morning/afternoon], ${esc(contact)} &mdash; ${esc(name)} with ${esc(company)}. Thanks for making time. Let's get into it."`},
+      {type:null,tip:`Say ${esc(contact)}'s name before anything else. If others are on the call, acknowledge every name you see in the room first.`}
+    ]);
+    html += ph(2,'Agenda set','~30 sec',[
+      {type:'rail',lbl:'Memorize',text:'"Here\'s our plan today: action items from last week, current project status, anything that needs your attention, and next steps. Should take us about [X] minutes."'},
+      {type:null,tip:'Never skip this line. 15 seconds. Every call, without exception.'}
+    ]);
+    html += ph(3,'Action item review','2&ndash;3 min',[
+      {type:'rail',lbl:'Memorize',text:'"Before we get into today\'s update, let\'s check in on what we committed to last week."'},
+      {type:'fill',...rev},
+      {type:'rail',lbl:'Memorize &mdash; all closed',text:'"Everything from last week is resolved &mdash; clean slate heading into today\'s update."'},
+      {type:'rail',lbl:'Memorize &mdash; items open',text:'"We have items still in progress &mdash; I\'ll make sure those get captured in today\'s action items."'},
+      {type:null,tip:'Check your ticket and notes status for every item before this call. &ldquo;I believe I sent it&rdquo; is not a status update.'}
+    ]);
+    html += ph(4,'Status update','5&ndash;10 min',[
+      {type:'rail',lbl:'Memorize',text:'"Alright &mdash; here\'s where things stand."'},
+      {type:'fill',...stat},
+      {type:null,tip:'Structure: wins &rarr; in progress &rarr; concerns. Every in-progress item needs a date. Every flag needs an action. Lead with good news.'}
+    ]);
+    html += ph(5,'Needs from client','2 min',[
+      {type:'rail',lbl:'Memorize',text:'"Before we get to next steps &mdash; there are a couple of things I need from your side to keep us moving."'},
+      {type:'fill',...need},
+      {type:'rail',lbl:'Memorize &mdash; no blockers',text:`"Nothing blocking us from ${esc(client)}'s side right now &mdash; we're clear to keep driving forward."`},
+      {type:null,tip:'Every ask needs a specific date. "Whenever you can" will never happen.'}
+    ]);
+    html += ph(6,'Next steps','2 min',[
+      {type:'rail',lbl:'Memorize',text:'"Before we close &mdash; let\'s lock in what happens next and who owns what."'},
+      {type:'fill',...next},
+      {type:null,tip:'Read every action item back out loud &mdash; owner and date. Ask if anyone has additions before you close.'}
+    ]);
+    html += ph(7,'Close','~30 sec',[
+      {type:'rail',lbl:'Memorize',text:`"That wraps us up. I'll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks ${esc(contact)} &mdash; appreciate your time."`},
+      {type:null,tip:'Give a specific time for the recap email, not &ldquo;I\'ll send something later.&rdquo; Send it fast.'}
+    ]);
   }
 
-  const out = document.getElementById('output');
-  out.innerHTML = html;
-  out.className = 'script on';
-  document.getElementById('printBtn').style.display = 'inline-block';
-  out.scrollIntoView({ behavior:'smooth', block:'start' });
+  const out=document.getElementById('output');
+  out.innerHTML=html;
+  out.className='script-out on';
+  document.getElementById('printbtn').style.display='inline-block';
+  out.scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// Init
+renderCols();
 </script>
 </body>
 </html>
