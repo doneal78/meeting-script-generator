@@ -139,7 +139,7 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
   <div class="step-body">
     <div class="row">
       <div class="fld"><label>Your name</label><input id="yourName" placeholder="e.g. David" oninput="refreshMeta()"/></div>
-      <div class="fld"><label>Your company</label><input id="yourCompany" placeholder="e.g. Acme Security" oninput="refreshMeta()"/></div>
+      <div class="fld"><label>Your company</label><input id="yourCompany" placeholder="e.g. Acme Security" /></div>
     </div>
     <div class="row">
       <div class="fld"><label>Client name</label><input id="clientName" placeholder="e.g. Coatue" oninput="refreshMeta()"/></div>
@@ -171,15 +171,14 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
     <button class="btn btn-extract btn-sm" onclick="extract()">&#128269; Extract commitments</button>
     <span class="extract-msg" id="emsg"></span>
 
-    <p style="font-size:12px;color:#888;margin-bottom:10px;font-style:italic">&#8592; Paste items from <strong>Copilot prompt output</strong>: <strong>LAST CALL &mdash; YOUR COMPANY</strong> items on the left, <strong>LAST CALL &mdash; CLIENT</strong> items on the right. Mark each one Done / In Progress / Blocked before the call.</p>
     <div class="cols">
       <div>
-        <div class="col-lbl us" id="us-col-lbl">&#128100; Your side</div>
+        <div class="col-lbl us">&#128100; Our commitments</div>
         <div id="us-list"></div>
         <button class="add-btn" onclick="addItem('us')">+ Add commitment</button>
       </div>
       <div>
-        <div class="col-lbl them" id="them-col-lbl">&#128101; Client side</div>
+        <div class="col-lbl them">&#128101; Their commitments</div>
         <div id="them-list"></div>
         <button class="add-btn" onclick="addItem('them')">+ Add commitment</button>
       </div>
@@ -198,36 +197,31 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
   <div class="step-body">
 
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-green"></span>Wins &amp; completed items <span style="font-weight:400;color:#888">— completed Zendesk tickets or resolved tasks the client should know about</span></div>
+      <div class="s3-lbl"><span class="dot d-green"></span>Wins &amp; completed items</div>
       <div id="wins-list"></div>
       <button class="add-btn" onclick="addU('wins')">+ Add win</button>
     </div>
 
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-amber"></span>In progress <span style="font-weight:400;color:#888">&#8592; Copilot: IN PROGRESS section &nbsp;&bull;&nbsp; item + expected completion date</span></div>
+      <div class="s3-lbl"><span class="dot d-amber"></span>In progress <span style="font-weight:400;color:#888">(add expected completion date)</span></div>
       <div id="prog-list"></div>
       <button class="add-btn" onclick="addU('prog')">+ Add in-progress item</button>
     </div>
 
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-red"></span>Flag items to bring up <span style="font-weight:400;color:#888">— add manually &nbsp;&bull;&nbsp; concern + what you&rsquo;re doing about it</span></div>
+      <div class="s3-lbl"><span class="dot d-red"></span>Flags or concerns <span style="font-weight:400;color:#888">(include what you&rsquo;re doing about it)</span></div>
       <div id="flags-list"></div>
       <button class="add-btn" onclick="addU('flags')">+ Add flag</button>
     </div>
 
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-purple" style="background:#6C5CE7"></span>Status context <span style="font-weight:400;color:#888">&#8592; Copilot: STATUS CONTEXT section &nbsp;&bull;&nbsp; background knowledge for Phase 4, not read aloud</span></div>
-      <textarea id="status-context" style="width:100%;font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;font-family:inherit;resize:vertical;min-height:64px;color:#1A1A1A" placeholder="Paste STATUS CONTEXT items here. These won't be read aloud but help you speak confidently in the status update phase. e.g. Administrative onboarding is largely complete. Core logs already ingested. SOAR capability confirmed."></textarea>
-    </div>
-
-    <div class="section3">
-      <div class="s3-lbl"><span class="dot d-blue"></span>What I need from the client <span style="font-weight:400;color:#888">— add manually &nbsp;&bull;&nbsp; specific ask + date needed by</span></div>
+      <div class="s3-lbl"><span class="dot d-blue"></span>What I need from the client <span style="font-weight:400;color:#888">(include date)</span></div>
       <div id="needs-list"></div>
       <button class="add-btn" onclick="addU('needs')">+ Add ask</button>
     </div>
 
-    <div class="section3" style="margin-bottom:0">
-      <div class="s3-lbl"><span class="dot d-navy"></span>Next call action items <span style="font-weight:400;color:#888">— commitments made ON THIS CALL &nbsp;&bull;&nbsp; goes in your recap email &nbsp;&bull;&nbsp; becomes next week&rsquo;s &ldquo;Last Call&rdquo; items</span></div>
+    <div class="section3">
+      <div class="s3-lbl"><span class="dot d-navy"></span>New action items for next call <span style="font-weight:400;color:#888">(owner + date)</span></div>
       <div id="next-list"></div>
       <button class="add-btn" onclick="addU('next')">+ Add action item</button>
     </div>
@@ -264,12 +258,8 @@ function tog(id){
 }
 
 function refreshMeta(){
-  const n=v('yourName'), c=v('clientName'), co=v('yourCompany');
+  const n=v('yourName'), c=v('clientName');
   document.getElementById('s1meta').textContent = (n&&c) ? n+' \u00B7 '+c : '';
-  const uLbl=document.getElementById('us-col-lbl');
-  const tLbl=document.getElementById('them-col-lbl');
-  if(uLbl) uLbl.innerHTML='&#128100; '+(co||'Your company')+' side';
-  if(tLbl) tLbl.innerHTML='&#128101; '+(c||'Client')+' side';
 }
 
 function v(id){ return document.getElementById(id).value.trim(); }
@@ -511,8 +501,8 @@ function generate(){
 
   if(type==='kickoff'){
     html += ph(1,'Opening + welcome','~2 min',[
-      {type:'rail',lbl:'Memorize',text:`"Good [morning/afternoon] everyone &mdash; ${esc(name)}, project manager at ${esc(company)}. Really glad to have you all on. Let's make the most of the next [X] minutes."`},
-      {type:null,tip:'State your full name and role clearly &mdash; this is the first call. Slower and more deliberate than your weekly cadence.'}
+      {type:'rail',lbl:'Memorize',text:`"Hey everyone &mdash; ${esc(name)}, project manager at ${esc(company)}. Really glad to have you all here. Let's jump in &mdash; got a lot of good stuff to cover."`},
+      {type:null,tip:"Say your full name and role clearly &mdash; this is the first call and they're still figuring out who's who. A little slower than your weekly, a little more deliberate."}
     ]);
     html += ph(2,'Team introductions','~3 min',[
       {type:'rail',lbl:'Memorize &mdash; your side',text:`"On our side: I'm ${esc(name)}, your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members will be introduced as we move through the project."`},
@@ -520,7 +510,7 @@ function generate(){
       {type:null,tip:'Listen carefully. Note who is technical vs. executive. This shapes how you communicate for the rest of the project.'}
     ]);
     html += ph(3,'Agenda overview','~1 min',[
-      {type:'rail',lbl:'Memorize',text:`"Here's our plan: overview of ${esc(company)} and service scope, implementation milestones, how you'll track project progress, and we'll close with clear next steps. Goal is to leave today aligned on where we're headed and what happens next."`}
+      {type:'rail',lbl:'Memorize',text:`"Here's what we're covering: who ${esc(company)} is and how we work, the project milestones, how you'll track progress, and we'll close with clear next steps. Goal is to leave today knowing exactly where we're headed."`}
     ]);
     html += ph(4,'Company overview + scope','~5 min',[
       {type:'rail',lbl:'Memorize &mdash; lead-in',text:`"Quick overview of who ${esc(company)} is and how we'll work together &mdash; then we'll get into your specific project."`},
