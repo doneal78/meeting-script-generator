@@ -314,12 +314,12 @@ function importCopilot(){
     if(c.match(/^STATUS CONTEXT/i)){cur='CTX';if(!secs[cur])secs[cur]=[];continue;}
     if(c.match(/^SKIP/i)){cur='SKIP';continue;}  // SKIP: discard all following items
 
-    // Bullet items — only when in a valid (non-SKIP) section
+    // Accept ANY line in a valid section — Copilot often strips bullet chars on copy
     if(cur&&cur!=='SKIP'){
-      const isBullet=t.startsWith('*')||t.startsWith('-')||t.startsWith('\u2022');
-      if(isBullet){
-        const tx=t.replace(/^[*\-\u2022]\s*/,'').trim();
-        if(tx.length>5){secs[cur]=secs[cur]||[];secs[cur].push(tx);}
+      // Remove bullet/list prefixes if present; also accept plain text lines
+      const tx=t.replace(/^[\u2022\u2023*\-\.\d]\s*/,'').trim();
+      if(tx.length>5&&!tx.match(/^(LAST CALL|IN PROGRESS|STATUS CONTEXT|SKIP)\b/i)){
+        secs[cur]=secs[cur]||[];secs[cur].push(tx);
       }
     }
   }
