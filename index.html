@@ -164,25 +164,23 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
   </div>
   <div class="step-body">
     <div class="fld" style="margin-bottom:8px">
-      <label>Paste your Copilot Prep Sorter output</label>
-      <textarea id="copilot-paste" class="transcript-area"
-        placeholder="Paste the full output from the Meeting Prep Sorter prompt here. The importer reads the LAST CALL, IN PROGRESS, and STATUS CONTEXT sections and routes everything to the right place automatically.
-
-Once imported, review each item, mark it Done / In Progress / Blocked / Pushed, then generate your script."></textarea>
+      <label>Paste last week&rsquo;s transcript or meeting notes</label>
+      <textarea id="transcript" class="transcript-area"
+        placeholder="Paste the full transcript or your notes here. The tool scans for action items, commitments, and follow-ups made by both sides — then lets you mark each one as done, in progress, blocked, or pushed."></textarea>
     </div>
-    <button class="btn btn-extract btn-sm" onclick="importCopilot()">⬇ Import &amp; route commitments</button>
+    <button class="btn btn-extract btn-sm" onclick="extract()">&#128269; Extract commitments</button>
     <span class="extract-msg" id="emsg"></span>
 
     <div class="cols">
       <div>
-        <div class="col-lbl us" id="us-col-lbl">&#128100; Your side</div>
+        <div class="col-lbl us">&#128100; Our commitments</div>
         <div id="us-list"></div>
-        <button class="add-btn" onclick="addItem('us')">+ Add manually</button>
+        <button class="add-btn" onclick="addItem('us')">+ Add commitment</button>
       </div>
       <div>
-        <div class="col-lbl them" id="them-col-lbl">&#128101; Client side</div>
+        <div class="col-lbl them">&#128101; Their commitments</div>
         <div id="them-list"></div>
-        <button class="add-btn" onclick="addItem('them')">+ Add manually</button>
+        <button class="add-btn" onclick="addItem('them')">+ Add commitment</button>
       </div>
     </div>
   </div>
@@ -260,12 +258,8 @@ function tog(id){
 }
 
 function refreshMeta(){
-  const n=v('yourName'),c=v('clientName'),co=v('yourCompany');
-  document.getElementById('s1meta').textContent=(n&&c)?n+' · '+c:'';
-  const uL=document.getElementById('us-col-lbl');
-  const tL=document.getElementById('them-col-lbl');
-  if(uL)uL.innerHTML='&#128100; '+(co||'Your company')+' side';
-  if(tL)tL.innerHTML='&#128101; '+(c||'Client')+' side';
+  const n=v('yourName'), c=v('clientName');
+  document.getElementById('s1meta').textContent = (n&&c) ? n+' \u00B7 '+c : '';
 }
 
 function v(id){ return document.getElementById(id).value.trim(); }
@@ -286,85 +280,28 @@ const PAT = [
 const OUR = [/\bI'?ll\b/i,/\bI will\b/i,/\bwe'?ll\b/i,/\bwe will\b/i,/\bI (sent|send|did|have|got|can)\b/i,/\bour (team|side|engineer|sock|soc)\b/i];
 const THR = [/\byou'?ll\b/i,/\byou will\b/i,/\byour (team|side|end)\b/i,/\bthe client\b/i,/\bon your end\b/i,/\bfrom your side\b/i];
 
-function importCopilot(){
-  const raw=document.getElementById('copilot-paste').value.trim();
-  if(!raw){document.getElementById('emsg').textContent='Paste your Copilot output first.';return;}
-
-  // Normalize before parsing: unify all dash types, arrows, bullets
-  const norm=raw
-    .replace(/[\u2012\u2013\u2014\u2015\u2212]/g,'-')  // all dashes -> hyphen
-    .replace(/\u2022|\u2023|\u25e6|\u2043/g,'*')         // all bullets -> *
-    .replace(/\u2192|\u27a1|->|=>/g,'>>');                // all arrows -> >>
-
-  const company=v('yourCompany').toLowerCase().trim();
-  const client=v('clientName').toLowerCase().trim();
-  const lines=norm.split('\n');
-  let cur=null,order=[],secs={};
-
-  for(let i=0;i<lines.length;i++){
-    const t=lines[i].trim(); if(!t) continue;
-    // Strip bold/italic/header markdown (** text ** or ## text)
-    const c=t.replace(/^\*{1,3}\s*|\s*\*{1,3}$/g,'').replace(/^#{1,3}\s*/,'').trim();
-
-    // Section header: LAST CALL - Company Name
-    const lcm=c.match(/^LAST CALL\s*[-:]\s*(.+)$/i);
-    if(lcm){cur='LC:'+lcm[1].replace(/\*+$/,'').trim();order.push(cur);secs[cur]=[];continue;}
-
-    if(c.match(/^IN PROGRESS/i)){cur='PROG';if(!secs[cur])secs[cur]=[];continue;}
-    if(c.match(/^STATUS CONTEXT/i)){cur='CTX';if(!secs[cur])secs[cur]=[];continue;}
-    if(c.match(/^SKIP/i)){cur='SKIP';continue;}  // SKIP: discard all following items
-
-    // Accept ANY line in a valid section — Copilot often strips bullet chars on copy
-    if(cur&&cur!=='SKIP'){
-      // Remove bullet/list prefixes if present; also accept plain text lines
-      const tx=t.replace(/^[\u2022\u2023*\-\.\d]\s*/,'').trim();
-      if(tx.length>5&&!tx.match(/^(LAST CALL|IN PROGRESS|STATUS CONTEXT|SKIP)\b/i)){
-        secs[cur]=secs[cur]||[];secs[cur].push(tx);
-      }
-    }
-  }
-
-  // Route LAST CALL items to columns
-  let lcN=0,prN=0,cxN=0;
-  const lcK=Object.keys(secs).filter(k=>k.startsWith('LC:'));
-  lcK.forEach((key,idx)=>{
-    const nm=key.slice(3).toLowerCase();
-    // Word-based matching: does any significant word from the section name appear in company/client?
-    const words=nm.split(/\s+/).filter(w=>w.length>3);
-    const ours=words.some(w=>company.includes(w))?true:words.some(w=>client.includes(w))?false:idx===0;
-    (secs[key]||[]).forEach(raw=>{
-      let tx=raw,st='progress';
-      // Status: ">> done", ">> in progress", ">> blocked", ">> pushed"
-      const sm=tx.match(/\s*>>\s*(in progress|done|blocked|pushed)\s*$/i);
-      if(sm){const s=sm[1].toLowerCase();if(s==='done')st='done';else if(s==='blocked')st='blocked';else if(s==='pushed')st='pushed';tx=tx.replace(sm[0],'').trim();}
-      const it={id:nid(),text:tx,status:st};
-      if(ours)usItems.push(it);else themItems.push(it);lcN++;
-    });
+function extract(){
+  const raw = document.getElementById('transcript').value.trim();
+  if(!raw){ document.getElementById('emsg').textContent='Paste a transcript first.'; return; }
+  const lines = raw.split(/[\n.!?]/).map(l=>l.trim()).filter(l=>l.length>20 && l.length<280);
+  const hits = [...new Set(lines.filter(l=>PAT.some(p=>p.test(l))))].slice(0,22);
+  let added=0;
+  hits.forEach(raw=>{
+    const text = raw.replace(/^[-\u2022*\s]+/,'').replace(/^[A-Za-z ]{1,20}:\s*/,'').trim();
+    if(text.length < 15) return;
+    const isTheirs = THR.some(p=>p.test(text)) && !OUR.some(p=>p.test(text));
+    const item = {id:nid(), text, status:'progress'};
+    if(isTheirs) themItems.push(item); else usItems.push(item);
+    added++;
   });
-
-  // Route IN PROGRESS to Step 3
-  (secs['PROG']||[]).forEach(raw=>{
-    let tx=raw,dt='';
-    const dm=tx.match(/\s*-\s*targeting\s+(.+?)\.?\s*$/i);
-    if(dm){dt=dm[1].trim();tx=tx.replace(dm[0],'').trim();}
-    U.prog.push({id:nid(),item:tx,date:dt,action:'',owner:''});prN++;
-  });
-  if(prN)renderU('prog');
-
-  // Route STATUS CONTEXT to textarea
-  if(secs['CTX']&&secs['CTX'].length){
-    const el=document.getElementById('status-context');
-    if(el)el.value=secs['CTX'].join('\n');cxN=secs['CTX'].length;
-  }
-
-  renderCols();refreshSummary();
-  const msg=lcN>0||prN>0
-    ?`Imported: ${lcN} commitment${lcN!==1?'s':''} \u2192 columns${prN?', '+prN+' in-progress \u2192 status update':''}${cxN?', '+cxN+' context items \u2192 notes':''}.`
-    :'Nothing found \u2014 make sure the output includes LAST CALL \u2014 [company] and LAST CALL \u2014 [client] sections.';
-  document.getElementById('emsg').textContent=msg;
-  document.getElementById('s2meta').textContent=`${lcN} commitment${lcN!==1?'s':''} imported`;
-  if(!document.getElementById('s2').classList.contains('open'))tog('s2');
+  renderCols();
+  document.getElementById('emsg').textContent = added>0
+    ? `Found ${added} item${added!==1?'s':''} — review, edit statuses, then move to Step 3.`
+    : 'Nothing found automatically — add items manually using the buttons below.';
+  document.getElementById('s2meta').textContent = `${added} item${added!==1?'s':''} extracted`;
+  if(!document.getElementById('s2').classList.contains('open')) tog('s2');
 }
+
 // ─── Commitment items ─────────────────────────────────────────────
 function renderCols(){
   renderCol('us-list', usItems, 'us');
@@ -564,67 +501,67 @@ function generate(){
 
   if(type==='kickoff'){
     html += ph(1,'Opening + welcome','~2 min',[
-      {type:'rail',lbl:'Memorize',text:`"Hey everyone &mdash; ${esc(name)}, project manager at ${esc(company)}. Really glad to have you all here. Let's jump in &mdash; got a lot of good stuff to cover."`},
-      {type:null,tip:"Say your full name and role clearly &mdash; this is the first call and they're still figuring out who's who. A little slower than your weekly, a little more deliberate."}
+      {type:'rail',lbl:'Memorize',text:`"Hey everyone &mdash; ${esc(name)} here, project manager at ${esc(company)}. Really glad to have you all on. Let\'s get into it."`},
+      {type:null,tip:'Say your name clearly &mdash; this is the first call and they\'re still figuring out who\'s who. A little slower than your weekly, a little more deliberate.'}
     ]);
     html += ph(2,'Team introductions','~3 min',[
-      {type:'rail',lbl:'Memorize &mdash; your side',text:`"On our side: I'm ${esc(name)}, your project manager and main point of contact throughout onboarding. [Technical Lead], our [title], is also on the line. Additional team members will be introduced as we move through the project."`},
+      {type:'rail',lbl:'Memorize &mdash; your side',text:`"On our end: I\'m ${esc(name)}, your project manager &mdash; main point of contact through onboarding. [Technical Lead] is also on the line today. We\'ll have more folks join as we get further into the project."`},
       {type:'fill',hot:false,text:`After your intro, invite ${esc(client)}: "I'd love to have everyone on your side do a quick intro &mdash; name, role, and anything specific you're hoping to get out of today."`},
-      {type:null,tip:'Listen carefully. Note who is technical vs. executive. This shapes how you communicate for the rest of the project.'}
+      {type:null,tip:'Pay attention during their intros. Note who\'s technical vs. leadership &mdash; it changes how you frame the rest of the call and the whole project.'}
     ]);
     html += ph(3,'Agenda overview','~1 min',[
-      {type:'rail',lbl:'Memorize',text:`"Here's what we're covering: who ${esc(company)} is and how we work, the project milestones, how you'll track progress, and we'll close with clear next steps. Goal is to leave today knowing exactly where we're headed."`}
+      {type:'rail',lbl:'Memorize',text:`"Here\'s what we\'re covering today: quick overview of ${esc(company)} and how we work, the project roadmap, how you\'ll track progress, and we\'ll close with next steps. Goal is to walk away knowing exactly what\'s happening and who\'s doing what."`}
     ]);
     html += ph(4,'Company overview + scope','~5 min',[
-      {type:'rail',lbl:'Memorize &mdash; lead-in',text:`"Quick overview of who ${esc(company)} is and how we'll work together &mdash; then we'll get into your specific project."`},
+      {type:'rail',lbl:'Memorize &mdash; lead-in',text:`"Let me give you a quick rundown of who ${esc(company)} is and how this works &mdash; then we\'ll get into your project."`},
       {type:'fill',hot:false,text:`1. 24/7 managed security services &mdash; goal is to extend ${esc(client)}'s team, not replace it.<br>2. Core service: SOC as a service &mdash; continuous monitoring, triage, escalation, response.<br>3. Workflow: alerts from your tools &rarr; enrichment &rarr; our analysts &rarr; escalation only when it matters.<br>4. Communication: [ticketing system] for escalations, [project tracker] for onboarding, weekly calls for status.<br>5. Live means: SOC monitoring 24/7, your team only gets called for what genuinely needs your attention.`},
-      {type:null,tip:'Hand off technical depth to your technical lead: "[Lead], I\'ll bring you in to walk through the workflow here." You own the process; they own the detail.'}
+      {type:null,tip:'When it gets technical, hand it off cleanly: &ldquo;[Lead], take it from here on the workflow.&rdquo; You own the project. They own the details. That\'s the right split.'}
     ]);
     html += ph(5,'Implementation milestones','~5 min',[
-      {type:'rail',lbl:'Memorize',text:'"Here\'s how the project is structured from today through go-live. Let me share my screen."'},
+      {type:'rail',lbl:'Memorize',text:'"Let me walk you through how the project runs from today all the way to go-live &mdash; I\'ll pull up our tracker real quick."'},
       {type:'fill',hot:false,text:'Walk your project tracker. Cover: Kickoff &rarr; Discovery &rarr; Configure + Ingest &rarr; Baseline Review &rarr; SOC Meet &amp; Greet &rarr; Go-Live.<br><br>Estimated end date: [from project tracker]. Factors that affect timing: questionnaire turnaround, access provisioning, log ingestion.'},
-      {type:null,tip:'Know the end date before you share your screen. Navigate directly to the right view &mdash; do not search around while they are watching.'}
+      {type:null,tip:'Know the end date before you screen share. Go straight to the right view &mdash; don\'t hunt around while they\'re watching. Dead air while you\'re searching is where stumbling lives.'}
     ]);
     html += ph(6,'Next steps','~5 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before we close &mdash; here\'s exactly what happens after this call."'},
+      {type:'rail',lbl:'Memorize',text:'"Before I let you all go &mdash; here\'s exactly what\'s happening after this call."'},
       {type:'fill',hot:false,text:`1. Follow-up email within the hour: deck, questionnaire, access sheet, weekly call times.<br>2. Questionnaire: fill out what you can quickly. Anything that takes months &mdash; skip it for now.<br>3. Weekly cadence: proposing [day] at [time]. Does that work for everyone?`},
       {type:'rail',lbl:'Memorize &mdash; close',text:`"That wraps up our kickoff. Really excited to be working with ${esc(client)} &mdash; you're in good hands. Watch for my email within the hour. ${esc(contact)}, if anything comes up before our first weekly call, my inbox is always open. Thanks everyone &mdash; great meeting."`}
     ]);
   } else {
     html += ph(1,'Opening','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:`"Good [morning/afternoon], ${esc(contact)} &mdash; ${esc(name)} with ${esc(company)}. Thanks for making time. Let's get into it."`},
-      {type:null,tip:`Say ${esc(contact)}'s name before anything else. If others are on the call, acknowledge every name you see in the room first.`}
+      {type:'rail',lbl:'Memorize',text:`"Hey ${esc(contact)} &mdash; ${esc(name)} here with ${esc(company)}. Good [morning/afternoon]. Thanks for jumping on, let's get into it."`},
+      {type:null,tip:`Their name first &mdash; every time. If your mind blanks at the opener, just say their name and the rest follows.`}
     ]);
     html += ph(2,'Agenda set','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:'"Here\'s our plan today: action items from last week, current project status, anything that needs your attention, and next steps. Should take us about [X] minutes."'},
-      {type:null,tip:'Never skip this line. 15 seconds. Every call, without exception.'}
+      {type:'rail',lbl:'Memorize',text:'"So real quick &mdash; I want to run through what we each had from last week, give you an update on where things are, flag anything that needs your attention, and close out with next steps. Shouldn\'t take long."'},
+      {type:null,tip:'Don\'t skip this. Twenty seconds, and it gives both of you a map for the whole call. When you drift mid-call, you can always come back to which of these four you\'re on.'}
     ]);
     html += ph(3,'Action item review','2&ndash;3 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before we get into today\'s update, let\'s check in on what we committed to last week."'},
+      {type:'rail',lbl:'Memorize',text:'"Before I get into this week &mdash; let me do a quick check on where we landed from last week."'},
       {type:'fill',...rev},
-      {type:'rail',lbl:'Memorize &mdash; all closed',text:'"Everything from last week is resolved &mdash; clean slate heading into today\'s update."'},
-      {type:'rail',lbl:'Memorize &mdash; items open',text:'"We have items still in progress &mdash; I\'ll make sure those get captured in today\'s action items."'},
-      {type:null,tip:'Check your ticket and notes status for every item before this call. &ldquo;I believe I sent it&rdquo; is not a status update.'}
+      {type:'rail',lbl:'Memorize &mdash; all wrapped up',text:'"Everything\'s taken care of from last week &mdash; clean slate going into today."'},
+      {type:'rail',lbl:'Memorize &mdash; things still in flight',text:'"Got a few things still in progress from last week &mdash; I\'ll make sure we capture those before we close out."'},
+      {type:null,tip:'Look at your tickets before the call. Five minutes in Zendesk the morning of means you know every status cold &mdash; and that\'s what stops stumbling here.'}
     ]);
     html += ph(4,'Status update','5&ndash;10 min',[
-      {type:'rail',lbl:'Memorize',text:'"Alright &mdash; here\'s where things stand."'},
+      {type:'rail',lbl:'Memorize',text:'"Alright &mdash; here\'s where we\'re at right now."'},
       {type:'fill',...stat},
-      {type:null,tip:'Structure: wins &rarr; in progress &rarr; concerns. Every in-progress item needs a date. Every flag needs an action. Lead with good news.'}
+      {type:null,tip:'Start with something positive &mdash; even one small win. Then run through what\'s in progress with dates, then anything you need to flag. That order keeps the energy positive and the call moving forward.'}
     ]);
     html += ph(5,'Needs from client','2 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before we get to next steps &mdash; there are a couple of things I need from your side to keep us moving."'},
+      {type:'rail',lbl:'Memorize',text:'"Before I let you go &mdash; I do need a couple of things from your end to keep things moving on our side."'},
       {type:'fill',...need},
       {type:'rail',lbl:'Memorize &mdash; no blockers',text:`"Nothing blocking us from ${esc(client)}'s side right now &mdash; we're clear to keep driving forward."`},
-      {type:null,tip:'Every ask needs a specific date. "Whenever you can" will never happen.'}
+      {type:null,tip:'Specific ask, specific date. If there\'s no deadline, it won\'t happen. &ldquo;I need this by Friday&rdquo; is a deadline. &ldquo;Whenever you can&rdquo; isn\'t.'}
     ]);
     html += ph(6,'Next steps','2 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before we close &mdash; let\'s lock in what happens next and who owns what."'},
+      {type:'rail',lbl:'Memorize',text:'"Last thing before I let you go &mdash; let me make sure we\'re on the same page on next steps and who\'s got what."'},
       {type:'fill',...next},
-      {type:null,tip:'Read every action item back out loud &mdash; owner and date. Ask if anyone has additions before you close.'}
+      {type:null,tip:'Read them back out loud &mdash; name, what they\'re doing, when. Then ask if anything got missed. This is where you prove you ran a tight meeting.'}
     ]);
     html += ph(7,'Close','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:`"That wraps us up. I'll send a recap with all action items by [specific time]. If anything comes up before next week, my inbox is open. Thanks ${esc(contact)} &mdash; appreciate your time."`},
-      {type:null,tip:'Give a specific time for the recap email, not &ldquo;I\'ll send something later.&rdquo; Send it fast.'}
+      {type:'rail',lbl:'Memorize',text:`"Alright, that\'s everything for today. I\'ll get the recap out with all the action items by [time]. Anything comes up before next week, just shoot me a message. Thanks ${esc(contact)}, appreciate the time."`},
+      {type:null,tip:'Name a time and stick to it. &ldquo;By end of day&rdquo; works. &ldquo;I\'ll send something later&rdquo; is how recaps don\'t happen.'}
     ]);
   }
 
