@@ -25,7 +25,7 @@ You don't have to memorize anything creative. You fill in what's actually happen
 
 ## Step 1 — Your Details
 
-Pretty straightforward. Your name, your company, the client name, who you're talking to, and whether it's a weekly call or a kickoff. These fill in throughout the script automatically — including the column labels in Step 2.
+Pretty straightforward. Your name, your company, the client name, who you're talking to, and whether it's a weekly call or a kickoff. These fill in throughout the script automatically including the column labels in Step 2.
 
 ---
 
@@ -39,7 +39,7 @@ The tool reads the output and sorts everything automatically:
 - In-progress work → Step 3 In Progress section
 - Background context → status notes textarea
 
-Once it's imported, go through each item and mark it — Done, In Progress, Blocked, or Pushed. That status shows up in Phase 3 of the script so you're not guessing what to say when you check in on last week.
+Once it's imported, go through each item and mark it Done, In Progress, Blocked, or Pushed. That status shows up in Phase 3 of the script so you're not guessing what to say when you check in on last week.
 
 If you don't have a Copilot output yet, you can add items manually using the + buttons.
 
@@ -47,17 +47,17 @@ If you don't have a Copilot output yet, you can add items manually using the + b
 
 ## Step 3 — This Week's Updates
 
-Five sections — fill in what applies, skip what doesn't.
+Five sections fill in what applies, skip what doesn't.
 
-**Wins & completed items** — anything that got wrapped up since last week. Closed Zendesk tickets, resolved issues, milestones hit. These are what you lead with in the status update.
+**Wins & completed items** anything that got wrapped up since last week. Closed Zendesk tickets, resolved issues, milestones hit. These are what you lead with in the status update.
 
-**In progress** — work that's underway. Add the item and the expected completion date. Every in-progress item needs a date — "we're working on it" without a timeline doesn't hold up on a call.
+**In progress** work that's underway. Add the item and the expected completion date. Every in-progress item needs a date "we're working on it" without a timeline doesn't hold up on a call.
 
-**Flag items to bring up** — concerns or issues you need to raise. Add the concern and what you're doing about it. Don't leave this blank just because the news isn't great — flagging something early is always better than explaining it later.
+**Flag items to bring up** — concerns or issues you need to raise. Add the concern and what you're doing about it. Don't leave this blank just because the news isn't great flagging something early is always better than explaining it later.
 
-**What I need from the client** — specific asks with dates. Not "whenever you can" — an actual date. This feeds directly into Phase 5 of the script.
+**What I need from the client** specific asks with dates. Not "whenever you can" an actual date. This feeds directly into Phase 5 of the script.
 
-**Next call action items** — commitments you're making on this call. Owner + item + date. After the call these go in your recap email — and next week they come back as the "Last Call" items in Step 2. That's the whole loop.
+**Next call action items** commitments you're making on this call. Owner + item + date. After the call these go in your recap email and next week they come back as the "Last Call" items in Step 2. That's the whole loop.
 
 ---
 
@@ -85,7 +85,7 @@ The seven phases:
 
 ## The Copilot Prep Sorter Prompt
 
-Run this in Copilot after every meeting. It works with formatted follow-up notes (the kind with Action Items and Next Steps sections) or a raw transcript — it figures out which one you gave it.
+Run this in Copilot after every meeting. It works with formatted follow-up notes (the kind with Action Items and Next Steps sections) or a raw transcript it figures out which one you gave it.
 
 Fill in your company and client name at the top, paste your content at the bottom, and run it.
 
@@ -162,7 +162,7 @@ CONTENT TO PROCESS:
 
 ## What the output looks like
 
-After running the prompt you'll get something like this — copy the whole thing and paste it into the Step 2 textarea:
+After running the prompt you'll get something like this copy the whole thing and paste it into the Step 2 textarea:
 
 ```
 LAST CALL — Legato Security
@@ -204,7 +204,7 @@ The "next call action items" you lock in today become "last call" items next Fri
 
 ## A few things worth knowing
 
-- Check your Zendesk tickets before filling in Step 2 — not the morning of the call, before you open the form. Knowing the real status on every item is what separates a clean update from a stumbling one.
+- Check your Zendesk tickets before filling in Step 2 not the morning of the call, before you open the form. Knowing the real status on every item is what separates a clean update from a stumbling one.
 - If a flag is resolved before the call, move it to Wins. That's a better story to lead with.
-- The green memorize lines aren't there to make you sound scripted — they're there so you don't have to construct sentences in real time while you're also managing the call.
+- The green memorize lines aren't there to make you sound scripted they're there so you don't have to construct sentences in real time while you're also managing the call.
 - Send the recap within an hour. That's what keeps the loop working.
