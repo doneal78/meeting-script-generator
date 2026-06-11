@@ -6,91 +6,63 @@
 <title>Meeting Script Generator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:#1A1A1A;padding:20px;max-width:880px;margin:0 auto}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#F0F2F5;color:#1A1A1A;padding:20px;max-width:880px;margin:0 auto}
 h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
 .sub{font-size:13px;color:#888;margin-bottom:20px}
-
-/* Steps */
 .step{background:#fff;border:1px solid #DDE3EC;border-radius:10px;margin-bottom:12px;overflow:hidden}
 .step-head{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none}
 .step-head:hover{background:#F8F9FB}
 .step-num{width:26px;height:26px;border-radius:50%;background:#1F3A5F;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step-title{font-size:15px;font-weight:600;color:#1F3A5F;flex:1}
 .step-meta{font-size:12px;color:#888}
-.step-arrow{font-size:11px;color:#AAA;transition:transform 0.2s}
+.step-arrow{font-size:11px;color:#AAA;transition:transform .2s}
 .step.open .step-arrow{transform:rotate(90deg)}
 .step-body{display:none;padding:16px 18px;border-top:1px solid #EEF1F6}
 .step.open .step-body{display:block}
-
-/* Form */
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.fld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.fld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
 .fld label{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.06em}
 .fld input,.fld select{font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#1A1A1A;font-family:inherit;width:100%}
 .fld input:focus,.fld select:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
-
-/* Transcript */
-.transcript-area{width:100%;min-height:110px;font-size:12px;font-family:inherit;padding:10px;border:1px solid #CCC;border-radius:6px;resize:vertical;background:#FAFAFA;color:#333;line-height:1.55;margin-bottom:8px}
-.transcript-area:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F;background:#fff}
-
-/* Buttons */
-.btn{padding:8px 16px;font-size:13px;font-weight:600;border-radius:6px;border:none;cursor:pointer;font-family:inherit}
-.btn-extract{background:#4A3F6B;color:#fff}
-.btn-extract:hover{background:#5C508A}
-.btn-sm{padding:5px 11px;font-size:12px}
-
-/* Commitment columns */
+.paste-area{width:100%;min-height:110px;font-size:12px;font-family:inherit;padding:10px;border:1px solid #CCC;border-radius:6px;resize:vertical;background:#FAFAFA;color:#333;line-height:1.55;margin-bottom:8px}
+.paste-area:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F;background:#fff}
+.import-btn{padding:8px 16px;font-size:13px;font-weight:600;border-radius:6px;border:none;background:#4A3F6B;color:#fff;cursor:pointer;font-family:inherit}
+.import-btn:hover{background:#5C508A}
+.import-msg{font-size:12px;color:#666;margin-left:10px;font-style:italic}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .col-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding-bottom:6px;border-bottom:2px solid #EEF1F6;margin-bottom:8px}
 .col-lbl.us{color:#0F6E56;border-color:#3DAA88}
 .col-lbl.them{color:#8B5000;border-color:#DDA820}
 .icard{background:#F8F9FB;border:1px solid #E5E9F0;border-radius:6px;padding:8px 10px;margin-bottom:6px}
-.itext{font-size:13px;line-height:1.45;color:#1A1A1A;margin-bottom:7px;border-radius:3px;min-height:18px;outline:none;cursor:text}
+.itext{font-size:13px;line-height:1.45;color:#1A1A1A;margin-bottom:7px;border-radius:3px;min-height:16px;outline:none;cursor:text}
 .itext:focus{background:#EEF6FF;box-shadow:0 0 0 2px #1F3A5F;padding:2px 4px}
 .srow{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .sbtn{font-size:11px;font-weight:500;padding:3px 8px;border-radius:12px;border:1px solid transparent;cursor:pointer;background:#E8ECF2;color:#555;font-family:inherit}
-.sbtn:hover{background:#D5DBE8}
 .s-done{background:#D4EDDA!important;color:#155724!important;border-color:#C3E6CB!important}
 .s-prog{background:#FFF3CD!important;color:#856404!important;border-color:#FFEEBA!important}
 .s-blkd{background:#F8D7DA!important;color:#721C24!important;border-color:#F5C6CB!important}
-.s-push{background:#E8ECF2!important;color:#444!important;border-color:#CED4DA!important}
+.s-push{background:#E8ECF2!important;color:#444!important}
 .idel{margin-left:auto;font-size:12px;color:#CCC;cursor:pointer;padding:2px 5px;border:none;background:none;font-family:inherit;border-radius:3px}
 .idel:hover{color:#C0392B;background:#FDF0EF}
 .add-btn{width:100%;font-size:12px;color:#1F3A5F;background:none;border:1px dashed #B0BEC5;border-radius:6px;padding:6px;cursor:pointer;margin-top:4px;font-family:inherit}
 .add-btn:hover{background:#EEF1F6;border-color:#1F3A5F}
 .empty-note{font-size:12px;color:#BBB;font-style:italic;padding:6px 0}
-
-/* Step 3 update rows */
+.s3-lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .section3{margin-bottom:16px}
-.s3-lbl{font-size:12px;font-weight:700;color:#1F3A5F;margin-bottom:7px;display:flex;align-items:center;gap:6px}
-.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
-.d-green{background:#3DAA88}
-.d-amber{background:#DDA820}
-.d-red{background:#E74C3C}
-.d-blue{background:#2E86AB}
-.d-navy{background:#1F3A5F}
 .urow{display:flex;gap:6px;margin-bottom:6px;align-items:center}
-.urow input{flex:1;font-size:13px;padding:6px 9px;border:1px solid #CCC;border-radius:5px;font-family:inherit;background:#fff;color:#1A1A1A}
+.urow input{flex:1;font-size:13px;padding:6px 9px;border:1px solid #CCC;border-radius:5px;font-family:inherit;color:#1A1A1A}
+.urow input.narrow{max-width:120px}
 .urow input:focus{outline:2px solid #1F3A5F;border-color:#1F3A5F}
-.urow input.narrow{max-width:130px}
-.udel{background:none;border:none;color:#CCC;cursor:pointer;font-size:16px;padding:2px 5px;line-height:1;font-family:inherit}
+.udel{background:none;border:none;color:#CCC;cursor:pointer;font-size:15px;padding:2px 5px;line-height:1}
 .udel:hover{color:#E74C3C}
-
-/* Summary bar */
 .sumbar{background:#EEF1F6;border-radius:8px;padding:10px 16px;margin:12px 0;display:none;flex-wrap:wrap;gap:16px;font-size:12px;color:#555;align-items:center}
 .sitem{display:flex;align-items:center;gap:5px}
 .scount{font-weight:700;color:#1A1A1A}
-
-/* Generate row */
-.gen-row{display:flex;gap:10px;margin:8px 0 20px;align-items:center;flex-wrap:wrap}
-.genbtn{padding:12px 28px;font-size:14px;font-weight:700;border-radius:8px;border:none;background:#1F3A5F;color:#fff;cursor:pointer}
-.genbtn:hover{background:#2E5080}
-.printbtn{padding:10px 16px;font-size:13px;border-radius:6px;border:1px solid #CCC;background:#fff;color:#444;cursor:pointer;display:none;font-family:inherit}
-.printbtn:hover{background:#F0F0F0}
-
-/* Script output */
+.gen-btn{padding:13px 32px;font-size:15px;font-weight:700;border-radius:8px;border:none;background:#1F3A5F;color:#fff;cursor:pointer;width:100%;letter-spacing:.02em;margin-top:4px}
+.gen-btn:hover{background:#2E5080}
 .script-out{display:none}
-.script-out.on{display:block}
+.script-out.on{display:block;margin-top:20px}
 .client-tag{display:inline-block;background:#EEF2F7;border:1px solid #C5D0E0;border-radius:4px;padding:3px 10px;font-size:12px;color:#1F3A5F;font-weight:600;margin-bottom:12px}
 .leg{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
@@ -101,49 +73,37 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
 .pname{font-size:13px;font-weight:600;color:#1F3A5F;flex:1}
 .ptime{font-size:11px;color:#888}
 .phb{padding:12px 14px;background:#fff}
-.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:13px;line-height:1.7;color:#1A1A1A}
+.rail{border-left:4px solid #3DAA88;background:#EAF7F2;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:14px;line-height:1.75;color:#1A1A1A}
 .fill{border-left:4px solid #DDA820;background:#FEF8EC;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:13px;line-height:1.7;color:#1A1A1A}
 .fill.hot{border-left-color:#E67E22;background:#FEF3E2}
-.tip{border-left:3px solid #CCC;background:#F5F5F5;padding:8px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:12px;line-height:1.6;color:#555}
+.tip{border-left:3px solid #CCC;background:#F4F5F7;padding:8px 12px;border-radius:0 5px 5px 0;margin-bottom:8px;font-size:12px;line-height:1.6;color:#555}
 .bl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.blr{color:#0F6E56}.blf{color:#8B5000}.blt{color:#888}.blh{color:#C0560A}
+.blr{color:#0F6E56}.blf{color:#8B5000}.blh{color:#C0560A}.blt{color:#888}
 .bdone{color:#155724;background:#D4EDDA;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
 .bprog{color:#856404;background:#FFF3CD;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
 .bblkd{color:#721C24;background:#F8D7DA;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
 .bpush{color:#444;background:#E8ECF2;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
-.extract-msg{font-size:12px;color:#666;margin-left:10px;font-style:italic}
-
 @media(max-width:580px){.cols{grid-template-columns:1fr}}
-@media print{
-  body{background:#fff;padding:8px;max-width:100%}
-  .step,.sumbar,.gen-row,.printbtn,.genbtn{display:none!important}
-  .script-out{display:block!important}
-  .phase{break-inside:avoid}
-  h1,.sub{display:none}
-}
+@media print{body{background:#fff;padding:8px;max-width:100%}.step,.sumbar,.gen-btn{display:none!important}.script-out{display:block!important}.phase{page-break-inside:avoid}}
 </style>
 </head>
 <body>
-
 <h1>Meeting Script Generator</h1>
-<p class="sub">Security Services &mdash; prep your call, review last week, and generate a ready-to-deliver script.</p>
+<p class="sub">Security Services &mdash; prep your call, import last week's output, and generate a script you can step through during the meeting.</p>
 
-<!-- ── STEP 1 ────────────────────────────────────────────────────── -->
 <div class="step open" id="s1">
   <div class="step-head" onclick="tog('s1')">
-    <div class="step-num">1</div>
-    <div class="step-title">Your Details</div>
-    <div class="step-meta" id="s1meta"></div>
-    <div class="step-arrow">&#9654;</div>
+    <div class="step-num">1</div><div class="step-title">Your Details</div>
+    <div class="step-meta" id="s1meta"></div><div class="step-arrow">&#9654;</div>
   </div>
   <div class="step-body">
     <div class="row">
       <div class="fld"><label>Your name</label><input id="yourName" placeholder="e.g. David" oninput="refreshMeta()"/></div>
-      <div class="fld"><label>Your company</label><input id="yourCompany" placeholder="e.g. Acme Security" /></div>
+      <div class="fld"><label>Your company</label><input id="yourCompany" placeholder="e.g. Acme Security" oninput="refreshMeta()"/></div>
     </div>
     <div class="row">
-      <div class="fld"><label>Client name</label><input id="clientName" placeholder="e.g. Coatue" oninput="refreshMeta()"/></div>
-      <div class="fld"><label>Primary contact</label><input id="contactName" placeholder="e.g. Max" /></div>
+      <div class="fld"><label>Client name</label><input id="clientName" placeholder="e.g. Lendistry" oninput="refreshMeta()"/></div>
+      <div class="fld"><label>Primary contact</label><input id="contactName" placeholder="e.g. Remo"/></div>
       <div class="fld"><label>Meeting type</label>
         <select id="meetingType">
           <option value="weekly">Weekly Status Call</option>
@@ -154,426 +114,347 @@ h1{font-size:22px;font-weight:600;color:#1F3A5F;margin-bottom:4px}
   </div>
 </div>
 
-<!-- ── STEP 2 ────────────────────────────────────────────────────── -->
 <div class="step" id="s2">
   <div class="step-head" onclick="tog('s2')">
-    <div class="step-num">2</div>
-    <div class="step-title">Last Call Review</div>
-    <div class="step-meta" id="s2meta">Paste transcript to pull out commitments</div>
-    <div class="step-arrow">&#9654;</div>
+    <div class="step-num">2</div><div class="step-title">Last Call Review</div>
+    <div class="step-meta" id="s2meta">Paste Copilot output to import</div><div class="step-arrow">&#9654;</div>
   </div>
   <div class="step-body">
     <div class="fld" style="margin-bottom:8px">
-      <label>Paste last week&rsquo;s transcript or meeting notes</label>
-      <textarea id="transcript" class="transcript-area"
-        placeholder="Paste the full transcript or your notes here. The tool scans for action items, commitments, and follow-ups made by both sides — then lets you mark each one as done, in progress, blocked, or pushed."></textarea>
+      <label>Paste your Copilot Prep Sorter output</label>
+      <textarea id="copilot-paste" class="paste-area" placeholder="Paste the full output from the Copilot Prep Sorter prompt here. The tool reads LAST CALL, IN PROGRESS, and STATUS CONTEXT sections and routes everything automatically.&#10;&#10;Once imported, mark each item Done / In Progress / Blocked / Pushed."></textarea>
     </div>
-    <button class="btn btn-extract btn-sm" onclick="extract()">&#128269; Extract commitments</button>
-    <span class="extract-msg" id="emsg"></span>
-
+    <button class="import-btn" onclick="importCopilot()">&#8595; Import &amp; route commitments</button>
+    <span class="import-msg" id="emsg"></span>
     <div class="cols">
       <div>
-        <div class="col-lbl us">&#128100; Our commitments</div>
+        <div class="col-lbl us" id="us-col-lbl">&#128100; Your side</div>
         <div id="us-list"></div>
-        <button class="add-btn" onclick="addItem('us')">+ Add commitment</button>
+        <button class="add-btn" onclick="addLC('us')">+ Add manually</button>
       </div>
       <div>
-        <div class="col-lbl them">&#128101; Their commitments</div>
+        <div class="col-lbl them" id="them-col-lbl">&#128101; Client side</div>
         <div id="them-list"></div>
-        <button class="add-btn" onclick="addItem('them')">+ Add commitment</button>
+        <button class="add-btn" onclick="addLC('them')">+ Add manually</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── STEP 3 ────────────────────────────────────────────────────── -->
 <div class="step" id="s3">
   <div class="step-head" onclick="tog('s3')">
-    <div class="step-num">3</div>
-    <div class="step-title">This Week&rsquo;s Updates</div>
-    <div class="step-meta" id="s3meta">Fill in your status updates</div>
-    <div class="step-arrow">&#9654;</div>
+    <div class="step-num">3</div><div class="step-title">This Week's Updates</div>
+    <div class="step-meta" id="s3meta">Fill in your updates</div><div class="step-arrow">&#9654;</div>
   </div>
   <div class="step-body">
-
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-green"></span>Wins &amp; completed items</div>
+      <div class="s3-lbl"><span class="dot" style="background:#3DAA88"></span>Wins &amp; completed items <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&mdash; completed Zendesk tickets or resolved tasks the client should know about</span></div>
       <div id="wins-list"></div>
       <button class="add-btn" onclick="addU('wins')">+ Add win</button>
     </div>
-
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-amber"></span>In progress <span style="font-weight:400;color:#888">(add expected completion date)</span></div>
+      <div class="s3-lbl"><span class="dot" style="background:#DDA820"></span>In progress <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&larr; also from Copilot: IN PROGRESS &nbsp;&bull;&nbsp; item + expected date</span></div>
       <div id="prog-list"></div>
       <button class="add-btn" onclick="addU('prog')">+ Add in-progress item</button>
     </div>
-
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-red"></span>Flags or concerns <span style="font-weight:400;color:#888">(include what you&rsquo;re doing about it)</span></div>
+      <div class="s3-lbl"><span class="dot" style="background:#E74C3C"></span>Flag items to bring up <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&mdash; add manually &nbsp;&bull;&nbsp; concern + what you're doing about it</span></div>
       <div id="flags-list"></div>
       <button class="add-btn" onclick="addU('flags')">+ Add flag</button>
     </div>
-
     <div class="section3">
-      <div class="s3-lbl"><span class="dot d-blue"></span>What I need from the client <span style="font-weight:400;color:#888">(include date)</span></div>
+      <div class="s3-lbl"><span class="dot" style="background:#2E86AB"></span>What I need from the client <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&mdash; add manually &nbsp;&bull;&nbsp; specific ask + date</span></div>
       <div id="needs-list"></div>
       <button class="add-btn" onclick="addU('needs')">+ Add ask</button>
     </div>
-
-    <div class="section3">
-      <div class="s3-lbl"><span class="dot d-navy"></span>New action items for next call <span style="font-weight:400;color:#888">(owner + date)</span></div>
+    <div class="section3" style="margin-bottom:8px">
+      <div class="s3-lbl"><span class="dot" style="background:#6C5CE7"></span>Status context <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&larr; from Copilot: STATUS CONTEXT &nbsp;&bull;&nbsp; background knowledge for the status update, not read aloud</span></div>
+      <textarea id="status-context" style="width:100%;font-size:13px;padding:7px 10px;border-radius:6px;border:1px solid #CCC;background:#fff;font-family:inherit;resize:vertical;min-height:64px;color:#1A1A1A" placeholder="Paste STATUS CONTEXT items here. These help you speak confidently but aren't read word-for-word."></textarea>
+    </div>
+    <div class="section3" style="margin-bottom:0">
+      <div class="s3-lbl"><span class="dot" style="background:#1F3A5F"></span>Next call action items <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#999;font-size:11px">&mdash; commitments made ON THIS CALL &nbsp;&bull;&nbsp; goes in recap email &nbsp;&bull;&nbsp; becomes next week's Last Call items</span></div>
       <div id="next-list"></div>
       <button class="add-btn" onclick="addU('next')">+ Add action item</button>
     </div>
-
   </div>
 </div>
 
-<!-- ── SUMMARY + GENERATE ─────────────────────────────────────────── -->
 <div class="sumbar" id="sumbar">
-  <div class="sitem"><div class="dot d-green"></div>Wins: <span class="scount" id="sc-wins">0</span></div>
-  <div class="sitem"><div class="dot d-amber"></div>In progress: <span class="scount" id="sc-prog">0</span></div>
-  <div class="sitem"><div class="dot d-red"></div>Flags: <span class="scount" id="sc-flags">0</span></div>
-  <div class="sitem"><div class="dot d-blue"></div>Client asks: <span class="scount" id="sc-needs">0</span></div>
-  <div class="sitem"><div class="dot d-navy"></div>Action items: <span class="scount" id="sc-next">0</span></div>
+  <div class="sitem"><span style="width:8px;height:8px;border-radius:50%;background:#3DAA88;display:inline-block"></span>Wins: <span class="scount" id="sc-wins">0</span></div>
+  <div class="sitem"><span style="width:8px;height:8px;border-radius:50%;background:#DDA820;display:inline-block"></span>In progress: <span class="scount" id="sc-prog">0</span></div>
+  <div class="sitem"><span style="width:8px;height:8px;border-radius:50%;background:#E74C3C;display:inline-block"></span>Flags: <span class="scount" id="sc-flags">0</span></div>
+  <div class="sitem"><span style="width:8px;height:8px;border-radius:50%;background:#2E86AB;display:inline-block"></span>Client asks: <span class="scount" id="sc-needs">0</span></div>
+  <div class="sitem"><span style="width:8px;height:8px;border-radius:50%;background:#1F3A5F;display:inline-block"></span>Action items: <span class="scount" id="sc-next">0</span></div>
 </div>
 
-<div class="gen-row">
-  <button class="genbtn" onclick="generate()">&#9654; Generate script</button>
-  <button class="printbtn" id="printbtn" onclick="window.print()">&#128438; Print / Save PDF</button>
-</div>
-
-<div class="script-out" id="output"></div>
+<button class="gen-btn" onclick="generate()">&#9654; &nbsp;Generate script</button>
+<div class="script-out" id="script-out"></div>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────
-let usItems=[], themItems=[], uid=0;
-const U = {wins:[], prog:[], flags:[], needs:[], next:[]};
+var uid=0,usItems=[],themItems=[];
+var U={wins:[],prog:[],flags:[],needs:[],next:[]};
+function nid(){return ++uid;}
+function v(id){return(document.getElementById(id)||{value:""}).value.trim();}
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function selAll(el){var r=document.createRange();r.selectNodeContents(el);var s=window.getSelection();s.removeAllRanges();s.addRange(r);}
 
-function nid(){ return ++uid; }
-
-// ─── Accordion ────────────────────────────────────────────────────
-function tog(id){
-  document.getElementById(id).classList.toggle('open');
-}
+function tog(id){document.getElementById(id).classList.toggle("open");}
 
 function refreshMeta(){
-  const n=v('yourName'), c=v('clientName');
-  document.getElementById('s1meta').textContent = (n&&c) ? n+' \u00B7 '+c : '';
+  var n=v("yourName"),c=v("clientName"),co=v("yourCompany");
+  document.getElementById("s1meta").textContent=(n&&c)?n+" \u00B7 "+c:"";
+  var uL=document.getElementById("us-col-lbl");
+  var tL=document.getElementById("them-col-lbl");
+  if(uL)uL.innerHTML="&#128100; "+(co||"Your company")+" side";
+  if(tL)tL.innerHTML="&#128101; "+(c||"Client")+" side";
 }
 
-function v(id){ return document.getElementById(id).value.trim(); }
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── Transcript extraction ────────────────────────────────────────
-const PAT = [
-  /\bI'?ll\b/i, /\bI will\b/i, /\bwe'?ll\b/i, /\bwe will\b/i,
-  /\bgoing to\b/i, /\baction item/i, /\bnext step/i, /\bfollow.?up\b/i,
-  /\bwill (send|check|confirm|get|look|reach|circle|schedule|set up|resend|follow|share|update)\b/i,
-  /\bby (next|end of|monday|tuesday|wednesday|thursday|friday|eod|eow|the end)\b/i,
-  /\bneed to\b/i, /\bget back to you\b/i, /\bcircle back\b/i,
-  /\bresend\b/i, /\blet (me|you) know\b/i, /\bstill owe\b/i,
-  /\bwaiting on\b/i, /\bcheck (with|on)\b/i, /\bconfirm\b/i,
-  /\bsend.{0,25}(over|you|email)\b/i, /\bshoot.{0,15}email\b/i,
-  /\bonce (I|we|he|she|they|you)\b/i, /\bpending\b/i
-];
-const OUR = [/\bI'?ll\b/i,/\bI will\b/i,/\bwe'?ll\b/i,/\bwe will\b/i,/\bI (sent|send|did|have|got|can)\b/i,/\bour (team|side|engineer|sock|soc)\b/i];
-const THR = [/\byou'?ll\b/i,/\byou will\b/i,/\byour (team|side|end)\b/i,/\bthe client\b/i,/\bon your end\b/i,/\bfrom your side\b/i];
-
-function extract(){
-  const raw = document.getElementById('transcript').value.trim();
-  if(!raw){ document.getElementById('emsg').textContent='Paste a transcript first.'; return; }
-  const lines = raw.split(/[\n.!?]/).map(l=>l.trim()).filter(l=>l.length>20 && l.length<280);
-  const hits = [...new Set(lines.filter(l=>PAT.some(p=>p.test(l))))].slice(0,22);
-  let added=0;
-  hits.forEach(raw=>{
-    const text = raw.replace(/^[-\u2022*\s]+/,'').replace(/^[A-Za-z ]{1,20}:\s*/,'').trim();
-    if(text.length < 15) return;
-    const isTheirs = THR.some(p=>p.test(text)) && !OUR.some(p=>p.test(text));
-    const item = {id:nid(), text, status:'progress'};
-    if(isTheirs) themItems.push(item); else usItems.push(item);
-    added++;
-  });
+// ── Last Call items ──────────────────────────────────────────────────
+function addLC(side,text,status){
+  var it={id:nid(),text:text||"",status:status||"progress"};
+  if(side==="us")usItems.push(it);else themItems.push(it);
   renderCols();
-  document.getElementById('emsg').textContent = added>0
-    ? `Found ${added} item${added!==1?'s':''} — review, edit statuses, then move to Step 3.`
-    : 'Nothing found automatically — add items manually using the buttons below.';
-  document.getElementById('s2meta').textContent = `${added} item${added!==1?'s':''} extracted`;
-  if(!document.getElementById('s2').classList.contains('open')) tog('s2');
+  if(!text){setTimeout(function(){
+    var c=document.getElementById("lc"+it.id);
+    if(c){var x=c.querySelector(".itext");x.focus();selAll(x);}
+  },50);}
 }
-
-// ─── Commitment items ─────────────────────────────────────────────
 function renderCols(){
-  renderCol('us-list', usItems, 'us');
-  renderCol('them-list', themItems, 'them');
+  renderCol("us-list",usItems,"us");
+  renderCol("them-list",themItems,"them");
+  refreshSummary();
+}
+function renderCol(elId,arr,side){
+  var el=document.getElementById(elId);
+  if(!arr.length){el.innerHTML="<div class=\"empty-note\">No items yet.</div>";return;}
+  el.innerHTML=arr.map(function(it){
+    return "<div class=\"icard\" id=\"lc"+it.id+"\">"+
+      "<div class=\"itext\" contenteditable=\"true\" onblur=\"lcE("+it.id+",\'"+side+"\',this)\" onfocus=\"selAll(this)\">"+esc(it.text)+"</div>"+
+      "<div class=\"srow\">"+
+      [["done","&#10003; Done","s-done"],["progress","&#9203; In progress","s-prog"],["blocked","&#10007; Blocked","s-blkd"],["pushed","&rarr; Pushed","s-push"]].map(function(x){
+        return "<button class=\"sbtn"+(it.status===x[0]?" "+x[2]:"")+"\" onclick=\"lcS("+it.id+",\'"+side+"\',\'"+x[0]+"\')\">"+x[1]+"</button>";
+      }).join("")+
+      "<button class=\"idel\" onclick=\"lcD("+it.id+",\'"+side+"\')\">&#10005;</button>"+
+      "</div></div>";
+  }).join("");
+}
+function lcE(id,side,el){var arr=side==="us"?usItems:themItems;var it=arr.find(function(x){return x.id===id;});if(it)it.text=el.innerText.trim();}
+function lcS(id,side,st){var arr=side==="us"?usItems:themItems;var it=arr.find(function(x){return x.id===id;});if(it){it.status=st;renderCols();}}
+function lcD(id,side){if(side==="us")usItems=usItems.filter(function(x){return x.id!==id;});else themItems=themItems.filter(function(x){return x.id!==id;});renderCols();}
+
+// ── Prep items ───────────────────────────────────────────────────────
+var CFG={wins:{ph:"What got done"},prog:{ph:"What is in progress",dp:"Expected by..."},flags:{ph:"Issue or concern",ap:"What you\'re doing about it"},needs:{ph:"What you need from them",dp:"Need by..."},next:{ph:"Action item",op:"Owner",dp:"By date"}};
+function addU(t){var id=nid();var ob={id:id,item:"",date:"",action:"",owner:""};U[t].push(ob);renderU(t);setTimeout(function(){var r=document.querySelector("#"+t+"-list [data-id=\""+id+"\"] input");if(r)r.focus();},50);}
+function delU(t,id){U[t]=U[t].filter(function(i){return i.id!==id;});renderU(t);refreshSummary();}
+function updU(t,id,f,val){var it=U[t].find(function(i){return i.id===id;});if(it)it[f]=val;}
+function renderU(t){
+  var el=document.getElementById(t+"-list");var arr=U[t];if(!arr.length){el.innerHTML="";return;}
+  el.innerHTML=arr.map(function(it){
+    return "<div class=\"urow\" data-id=\""+it.id+"\">"+
+      "<input placeholder=\""+CFG[t].ph+"\" value=\""+esc(it.item)+"\" oninput=\"updU(\'"+t+"\',"+it.id+",\'item\',this.value)\"/>"+
+      (CFG[t].ap?"<input placeholder=\""+CFG[t].ap+"\" value=\""+esc(it.action||"")+"\" oninput=\"updU(\'"+t+"\',"+it.id+",\'action\',this.value)\"/>"  :"")+
+      (CFG[t].op?"<input class=\"narrow\" placeholder=\""+CFG[t].op+"\" value=\""+esc(it.owner||"")+"\" oninput=\"updU(\'"+t+"\',"+it.id+",\'owner\',this.value)\"/>":"")+
+      (CFG[t].dp?"<input class=\"narrow\" placeholder=\""+CFG[t].dp+"\" value=\""+esc(it.date||"")+"\" oninput=\"updU(\'"+t+"\',"+it.id+",\'date\',this.value)\"/>":"")+
+      "<button class=\"udel\" onclick=\"delU(\'"+t+"\',"+it.id+")\">&#10005;</button></div>";
+  }).join("");
   refreshSummary();
 }
 
-function renderCol(elId, arr, side){
-  const el = document.getElementById(elId);
-  if(!arr.length){ el.innerHTML='<div class="empty-note">No items yet.</div>'; return; }
-  el.innerHTML = arr.map(it=>`
-    <div class="icard" id="ic${it.id}">
-      <div class="itext" contenteditable="true"
-           onblur="editItem(${it.id},'${side}',this)"
-           onfocus="selAll(this)">${esc(it.text)}</div>
-      <div class="srow">
-        ${[['done','&#10003; Done','s-done'],['progress','&#9203; In progress','s-prog'],['blocked','&#10007; Blocked','s-blkd'],['pushed','&rarr; Pushed','s-push']].map(([s,lbl,cls])=>
-          `<button class="sbtn${it.status===s?' '+cls:''}" onclick="setS(${it.id},'${side}','${s}')">${lbl}</button>`
-        ).join('')}
-        <button class="idel" onclick="delItem(${it.id},'${side}')">&#10005;</button>
-      </div>
-    </div>`).join('');
-}
-
-function selAll(el){ const r=document.createRange(); r.selectNodeContents(el); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
-
-function addItem(side){
-  const item={id:nid(),text:'Click to edit',status:'progress'};
-  if(side==='us') usItems.push(item); else themItems.push(item);
-  renderCols();
-  setTimeout(()=>{ const c=document.getElementById('ic'+item.id); if(c){ const t=c.querySelector('.itext'); t.focus(); selAll(t); }},60);
-}
-
-function editItem(id, side, el){
-  const arr = side==='us'?usItems:themItems;
-  const it = arr.find(i=>i.id===id);
-  if(it) it.text = el.innerText.trim();
-  refreshSummary();
-}
-
-function setS(id, side, status){
-  const arr = side==='us'?usItems:themItems;
-  const it = arr.find(i=>i.id===id);
-  if(it){ it.status=status; renderCols(); }
-}
-
-function delItem(id, side){
-  if(side==='us') usItems=usItems.filter(i=>i.id!==id);
-  else themItems=themItems.filter(i=>i.id!==id);
-  renderCols();
-}
-
-// ─── Step 3 update items ──────────────────────────────────────────
-const CFG = {
-  wins:  {ph:'What got done this week',           fields:['item']},
-  prog:  {ph:'What is in progress',               fields:['item','date'], dp:'Expected by...'},
-  flags: {ph:'Issue or concern',                  fields:['item','action'], ap:'What you\'re doing about it'},
-  needs: {ph:'What you need from the client',     fields:['item','date'], dp:'Need by...'},
-  next:  {ph:'Action item',                       fields:['item','owner','date'], op:'Owner', dp:'By date'}
-};
-
-function addU(type){
-  const id=nid();
-  U[type].push({id,item:'',date:'',action:'',owner:''});
-  renderU(type);
-  setTimeout(()=>{ const r=document.querySelector(`#${type}-list [data-id="${id}"] input`); if(r) r.focus(); },60);
-}
-
-function delU(type, id){
-  U[type]=U[type].filter(i=>i.id!==id);
-  renderU(type);
-  refreshSummary();
-}
-
-function updF(type, id, field, val){
-  const it=U[type].find(i=>i.id===id);
-  if(it){ it[field]=val; refreshSummary(); }
-}
-
-function renderU(type){
-  const el=document.getElementById(type+'-list');
-  const cfg=CFG[type]; const arr=U[type];
-  if(!arr.length){ el.innerHTML=''; return; }
-  el.innerHTML=arr.map(it=>`
-    <div class="urow" data-id="${it.id}">
-      <input placeholder="${cfg.ph}" value="${esc(it.item)}" oninput="updF('${type}',${it.id},'item',this.value)"/>
-      ${cfg.fields.includes('date')?`<input class="narrow" placeholder="${cfg.dp||'Date'}" value="${esc(it.date)}" oninput="updF('${type}',${it.id},'date',this.value)"/>`:''}
-      ${cfg.fields.includes('action')?`<input placeholder="${cfg.ap||'Action'}" value="${esc(it.action)}" oninput="updF('${type}',${it.id},'action',this.value)"/>`:''}
-      ${cfg.fields.includes('owner')?`<input class="narrow" placeholder="${cfg.op||'Owner'}" value="${esc(it.owner)}" oninput="updF('${type}',${it.id},'owner',this.value)"/>`:''}
-      <button class="udel" onclick="delU('${type}',${it.id})">&#10005;</button>
-    </div>`).join('');
-  refreshSummary();
-}
-
-// ─── Summary bar ──────────────────────────────────────────────────
+// ── Summary bar ──────────────────────────────────────────────────────
 function refreshSummary(){
-  const c={
-    wins: U.wins.filter(i=>i.item).length,
-    prog: U.prog.filter(i=>i.item).length,
-    flags:U.flags.filter(i=>i.item).length,
-    needs:U.needs.filter(i=>i.item).length,
-    next: U.next.filter(i=>i.item).length
-  };
-  const total=Object.values(c).reduce((a,b)=>a+b,0)+(usItems.length+themItems.length);
-  const bar=document.getElementById('sumbar');
-  bar.style.display=total>0?'flex':'none';
-  document.getElementById('sc-wins').textContent=c.wins;
-  document.getElementById('sc-prog').textContent=c.prog;
-  document.getElementById('sc-flags').textContent=c.flags;
-  document.getElementById('sc-needs').textContent=c.needs;
-  document.getElementById('sc-next').textContent=c.next;
-  document.getElementById('s3meta').textContent=total>0?`${total} update${total!==1?'s':''} ready`:'Fill in your status updates';
+  var c={wins:U.wins.filter(function(i){return i.item;}).length,prog:U.prog.filter(function(i){return i.item;}).length,flags:U.flags.filter(function(i){return i.item;}).length,needs:U.needs.filter(function(i){return i.item;}).length,next:U.next.filter(function(i){return i.item;}).length};
+  var total=c.wins+c.prog+c.flags+c.needs+c.next+usItems.length+themItems.length;
+  var bar=document.getElementById("sumbar");bar.style.display=total>0?"flex":"none";
+  document.getElementById("sc-wins").textContent=c.wins;document.getElementById("sc-prog").textContent=c.prog;
+  document.getElementById("sc-flags").textContent=c.flags;document.getElementById("sc-needs").textContent=c.needs;
+  document.getElementById("sc-next").textContent=c.next;
+  document.getElementById("s3meta").textContent=total>0?(c.wins+c.prog+c.flags+c.needs+c.next)+" updates ready":"Fill in your updates";
 }
 
-// ─── Badges ───────────────────────────────────────────────────────
-function bdg(s){
-  if(s==='done') return '<span class="bdone">&#10003; Done</span>';
-  if(s==='progress') return '<span class="bprog">&#9203; In progress</span>';
-  if(s==='blocked') return '<span class="bblkd">&#10007; Blocked</span>';
-  return '<span class="bpush">&rarr; Pushed</span>';
+// ── Import from Copilot output ───────────────────────────────────────
+function importCopilot(){
+  var raw=document.getElementById("copilot-paste").value.trim();
+  if(!raw){document.getElementById("emsg").textContent="Paste your Copilot output first.";return;}
+  // Normalize: unify all dash types, arrow types, bullet types
+  var norm=raw
+    .replace(/[\u2012\u2013\u2014\u2015\u2212]/g,"-")
+    .replace(/[\u2022\u2023\u25e6\u2043]/g,"*")
+    .replace(/[\u2192\u27a1]|->|=>/g,">>");
+  var lines=norm.split("\n");
+  var cur=null,secs={},order=[];
+  for(var i=0;i<lines.length;i++){
+    var t=lines[i].trim();if(!t)continue;
+    var c=t.replace(/^[*#_]+\s*|\s*[*#_]+$/g,"").trim();
+    var lc=c.match(/^LAST CALL\s*[-:]\s*(.+)$/i);
+    if(lc){cur="LC:"+lc[1].replace(/[*_]+$/,"").trim();order.push(cur);secs[cur]=[];continue;}
+    if(c.match(/^IN PROGRESS/i)){cur="PROG";secs[cur]=secs[cur]||[];continue;}
+    if(c.match(/^STATUS CONTEXT/i)){cur="CTX";secs[cur]=secs[cur]||[];continue;}
+    if(c.match(/^SKIP/i)){cur="SKIP";continue;}
+    if(cur&&cur!=="SKIP"){
+      var tx=t.replace(/^[\u2022*\-]\s*/,"").trim();
+      if(tx.length>5&&!tx.match(/^(LAST CALL|IN PROGRESS|STATUS CONTEXT|SKIP)\b/i)){
+        secs[cur]=secs[cur]||[];secs[cur].push(tx);
+      }
+    }
+  }
+  var company=v("yourCompany").toLowerCase().trim();
+  var client=v("clientName").toLowerCase().trim();
+  var lcKeys=Object.keys(secs).filter(function(k){return k.startsWith("LC:");});
+  var lcN=0,prN=0,cxN=0;
+  lcKeys.forEach(function(key,idx){
+    var nm=key.slice(3).toLowerCase();
+    var words=nm.split(/\s+/).filter(function(w){return w.length>3;});
+    var ours=words.some(function(w){return company.includes(w);})?true:words.some(function(w){return client.includes(w);})?false:idx===0;
+    (secs[key]||[]).forEach(function(raw){
+      var tx=raw,st="progress";
+      var sm=tx.match(/\s*>>\s*(in progress|done|blocked|pushed)\s*$/i);
+      if(sm){var s=sm[1].toLowerCase();if(s==="done")st="done";else if(s==="blocked")st="blocked";else if(s==="pushed")st="pushed";tx=tx.replace(sm[0],"").trim();}
+      addLC(ours?"us":"them",tx,st);lcN++;
+    });
+  });
+  (secs["PROG"]||[]).forEach(function(raw){
+    var tx=raw,dt="";
+    var dm=tx.match(/\s*-\s*targeting\s+(.+?)\.?\s*$/i);
+    if(dm){dt=dm[1].trim();tx=tx.replace(dm[0],"").trim();}
+    U.prog.push({id:nid(),item:tx,date:dt,action:"",owner:""});prN++;
+  });
+  if(prN)renderU("prog");
+  if(secs["CTX"]&&secs["CTX"].length){var el=document.getElementById("status-context");if(el)el.value=secs["CTX"].join("\n");cxN=secs["CTX"].length;}
+  renderCols();refreshSummary();
+  var msg=lcN>0||prN>0?"Imported: "+lcN+" commitment"+(lcN!==1?"s":"")+" \u2192 columns"+(prN?", "+prN+" in-progress \u2192 status update":"")+(cxN?", "+cxN+" context items \u2192 notes":"")+"."
+    :"Nothing found \u2014 make sure the output includes LAST CALL \u2014 [company] and LAST CALL \u2014 [client] sections.";
+  document.getElementById("emsg").textContent=msg;
+  document.getElementById("s2meta").textContent=lcN+" commitment"+(lcN!==1?"s":"")+" imported";
+  if(!document.getElementById("s2").classList.contains("open"))tog("s2");
 }
 
-// ─── Build fill-in content ────────────────────────────────────────
+// ── Badges ───────────────────────────────────────────────────────────
+function bdg(s){if(s==="done")return"<span class=\"bdone\">&#10003; Done</span>";if(s==="progress")return"<span class=\"bprog\">&#9203; In progress</span>";if(s==="blocked")return"<span class=\"bblkd\">&#10007; Blocked</span>";return"<span class=\"bpush\">&rarr; Pushed</span>";}
+
+// ── Phase builder ────────────────────────────────────────────────────
+function ph(num,name,time,blocks){
+  var inner=blocks.map(function(b){
+    if(!b.type)return b.tip?"<div class=\"tip\"><div class=\"bl blt\">Coaching tip</div>"+b.tip+"</div>":"";
+    if(b.type==="rail")return"<div class=\"rail\"><div class=\"bl blr\">"+b.lbl+"</div>"+b.text+"</div>";
+    var cls="fill"+(b.hot?" hot":"");var lc=b.hot?"blh":"blf";
+    return"<div class=\""+cls+"\"><div class=\"bl "+lc+"\">"+( b.lbl||(b.hot?"From your prep \u2014 ready to deliver":"Fill in with current status"))+"</div>"+b.text+"</div>";
+  }).join("");
+  return"<div class=\"phase\"><div class=\"phd\"><span class=\"pnum\">Phase "+num+"</span><span class=\"pname\">"+name+"</span><span class=\"ptime\">"+time+"</span></div><div class=\"phb\">"+inner+"</div></div>";
+}
+
+// ── Build content ────────────────────────────────────────────────────
 function buildReview(contact){
-  if(!usItems.length && !themItems.length)
-    return { text:`"From our side: [Item 1] &mdash; [status]. [Item 2] &mdash; [status].<br><br>From ${contact}'s side &mdash; you were going to [do X]. Did you get a chance to get into that?"`, hot:false };
-  const u=usItems.map(i=>`&bull; ${esc(i.text)} &mdash; ${bdg(i.status)}`).join('<br>');
-  const t=themItems.map(i=>`&bull; ${esc(i.text)} &mdash; ${bdg(i.status)}`).join('<br>');
-  let out='';
-  if(usItems.length) out+=`<strong>Our side:</strong><br>${u}`;
-  if(usItems.length&&themItems.length) out+='<br><br>';
-  if(themItems.length) out+=`<strong>${esc(contact)}'s side:</strong><br>${t}`;
-  return {text:out, hot:true};
+  var li=usItems.concat(themItems);
+  if(!li.length)return{text:"From our side: [Item 1] \u2014 [status]. [Item 2] \u2014 [status].<br><br>From "+esc(contact)+"'s side \u2014 you were going to [do X]. Did you get a chance to get into that?",hot:false};
+  var out="";
+  if(usItems.length)out+="<strong>Our side:</strong><br>"+usItems.map(function(i){return "\u2022 "+esc(i.text)+" \u2014 "+bdg(i.status);}).join("<br>");
+  if(usItems.length&&themItems.length)out+="<br><br>";
+  if(themItems.length)out+="<strong>"+esc(contact)+"'s side:</strong><br>"+themItems.map(function(i){return "\u2022 "+esc(i.text)+" \u2014 "+bdg(i.status);}).join("<br>");
+  return{text:out,hot:true};
 }
-
 function buildStatus(client){
-  const w=U.wins.filter(i=>i.item), p=U.prog.filter(i=>i.item), f=U.flags.filter(i=>i.item);
-  if(!w.length&&!p.length&&!f.length)
-    return {text:`Good news first: "[Completed item] &mdash; good milestone for ${esc(client)}."<br><br>In progress: "[Item] &mdash; expected completion [date]."<br><br>Flagging: "One thing I want to flag: [issue]. Here's what we're doing: [action]."`, hot:false};
-  const parts=[];
-  if(w.length) parts.push('<strong>Wins:</strong><br>'+w.map(i=>`&bull; ${esc(i.item)}`).join('<br>'));
-  if(p.length) parts.push('<strong>In progress:</strong><br>'+p.map(i=>`&bull; ${esc(i.item)}${i.date?' &mdash; targeting '+esc(i.date):''}`).join('<br>'));
-  if(f.length) parts.push('<strong>Flagging:</strong><br>'+f.map(i=>`&bull; ${esc(i.item)}${i.action?' &rarr; '+esc(i.action):''}`).join('<br>'));
-  return {text:parts.join('<br><br>'), hot:true};
+  var w=U.wins.filter(function(i){return i.item;}),p=U.prog.filter(function(i){return i.item;}),f=U.flags.filter(function(i){return i.item;});
+  if(!w.length&&!p.length&&!f.length)return{text:"Good news first: '[Completed item] \u2014 good milestone for "+esc(client)+".'"+"<br><br>In progress: '[Item] \u2014 targeting [date].'"+"<br><br>Flagging: 'One thing I want to flag: [issue]. Here's what we're doing: [action].'",hot:false};
+  var parts=[];
+  if(w.length)parts.push("<strong>Wins:</strong><br>"+w.map(function(i){return "\u2022 "+esc(i.item);}).join("<br>"));
+  if(p.length)parts.push("<strong>In progress:</strong><br>"+p.map(function(i){return "\u2022 "+esc(i.item)+(i.date?" \u2014 targeting "+esc(i.date):"");}).join("<br>"));
+  if(f.length)parts.push("<strong>Flagging:</strong><br>"+f.map(function(i){return "\u2022 "+esc(i.item)+(i.action?" \u2192 "+esc(i.action):"");}).join("<br>"));
+  return{text:parts.join("<br><br>"),hot:true};
 }
-
 function buildNeeds(){
-  const n=U.needs.filter(i=>i.item);
-  if(!n.length) return {text:'"I need [specific item] by [specific date] to stay on schedule."',hot:false};
-  return {text:n.map(i=>`"I need ${esc(i.item)}${i.date?' by '+esc(i.date):'.'}"`).join('<br><br>'), hot:true};
+  var n=U.needs.filter(function(i){return i.item;});
+  if(!n.length)return{text:"'I need [specific item] by [specific date] to stay on track.'",hot:false};
+  return{text:n.map(function(i){return "\u2022 "+esc(i.item)+(i.date?" \u2014 need this by "+esc(i.date):"");}).join("<br>"),hot:true};
+}
+function buildNext(name,contact){
+  var x=U.next.filter(function(i){return i.item;});
+  if(!x.length)return{text:"'"+esc(name)+" will [item] by [date]. "+esc(contact)+" will [item] by [date]. Anyone have additions?'",hot:false};
+  return{text:x.map(function(i){return "\u2022 "+(i.owner?esc(i.owner):esc(name))+" \u2014 "+esc(i.item)+(i.date?" by "+esc(i.date):"");}).join("<br>"),hot:true};
 }
 
-function buildNext(name, contact){
-  const ns=U.next.filter(i=>i.item);
-  const theirOpen=themItems.filter(i=>i.status==='progress'||i.status==='blocked');
-  if(!ns.length&&!theirOpen.length)
-    return {text:`"${esc(name)} will [item] by [date]. ${esc(contact)} will [item] by [date]. Anyone have additions?"`,hot:false};
-  const lines=[];
-  ns.forEach(i=>{ const own=i.owner||name; lines.push(`${esc(own)} will ${esc(i.item)}${i.date?' by '+esc(i.date):'.'}`); });
-  theirOpen.forEach(i=>lines.push(`${esc(contact)} &mdash; follow up on: ${esc(i.text)}`));
-  return {text:lines.join('<br>'), hot:true};
-}
-
-// ─── Phase builder ────────────────────────────────────────────────
-function ph(num, name, time, blocks){
-  const inner=blocks.map(b=>{
-    if(!b.type) return b.tip?`<div class="tip"><div class="bl blt">Tip</div>${b.tip}</div>`:'';
-    if(b.type==='rail') return `<div class="rail"><div class="bl blr">${b.lbl}</div>${b.text}</div>`;
-    const cls='fill'+(b.hot?' hot':'');
-    const lc=b.hot?'blh':'blf';
-    const lbl=b.hot?'From your prep &mdash; ready to deliver':'Fill in with current status';
-    return `<div class="${cls}"><div class="bl ${lc}">${lbl}</div>${b.text}</div>`;
-  }).join('');
-  return `<div class="phase"><div class="phd"><span class="pnum">Phase ${num}</span><span class="pname">${name}</span><span class="ptime">${time}</span></div><div class="phb">${inner}</div></div>`;
-}
-
-// ─── Generate ─────────────────────────────────────────────────────
+// ── Generate ─────────────────────────────────────────────────────────
 function generate(){
-  const name    = v('yourName')    || '[Your Name]';
-  const company = v('yourCompany') || '[Your Company]';
-  const client  = v('clientName')  || 'Client';
-  const contact = v('contactName') || 'Team';
-  const type    = document.getElementById('meetingType').value;
-
-  const rev  = buildReview(contact);
-  const stat = buildStatus(client);
-  const need = buildNeeds();
-  const next = buildNext(name, contact);
-
-  let html=`<div class="client-tag">${esc(client)} &mdash; ${type==='kickoff'?'Kickoff Meeting':'Weekly Status Call'}</div>
-  <div class="leg">
-    <div class="li"><div class="ld" style="background:#3DAA88"></div>Memorize word for word</div>
-    <div class="li"><div class="ld" style="background:#DDA820"></div>Fill in manually</div>
-    <div class="li"><div class="ld" style="background:#E67E22"></div>Pre-populated from your prep</div>
-    <div class="li"><div class="ld" style="background:#CCC"></div>Tip</div>
-  </div>`;
-
-  if(type==='kickoff'){
-    html += ph(1,'Opening + welcome','~2 min',[
-      {type:'rail',lbl:'Memorize',text:`"Hey everyone &mdash; ${esc(name)} here, project manager at ${esc(company)}. Really glad to have you all on. Let\'s get into it."`},
-      {type:null,tip:'Say your name clearly &mdash; this is the first call and they\'re still figuring out who\'s who. A little slower than your weekly, a little more deliberate.'}
+  var name=v("yourName")||"[Your Name]";
+  var company=v("yourCompany")||"[Your Company]";
+  var client=v("clientName")||"Client";
+  var contact=v("contactName")||"Team";
+  var type=document.getElementById("meetingType").value;
+  var rev=buildReview(contact),stat=buildStatus(client),need=buildNeeds(),nxt=buildNext(name,contact);
+  var html="<div class=\"client-tag\">"+esc(client)+" \u2014 "+(type==="kickoff"?"Kickoff Meeting":"Weekly Status Call")+"</div>";
+  html+="<div class=\"leg\"><div class=\"li\"><div class=\"ld\" style=\"background:#3DAA88\"></div>Memorize word for word</div><div class=\"li\"><div class=\"ld\" style=\"background:#DDA820\"></div>Fill in manually</div><div class=\"li\"><div class=\"ld\" style=\"background:#E67E22\"></div>From your prep</div><div class=\"li\"><div class=\"ld\" style=\"background:#CCC\"></div>Tip</div></div>";
+  if(type==="kickoff"){
+    html+=ph(1,"Opening + welcome","~2 min",[
+      {type:"rail",lbl:"Memorize",text:""Hey everyone \u2014 "+esc(name)+" here, project manager at "+esc(company)+". Really glad to have you all on. Let's get into it.""},
+      {type:null,tip:"Say your name clearly \u2014 this is the first call and they're still figuring out who's who. A little slower than your weekly, a little more deliberate."}
     ]);
-    html += ph(2,'Team introductions','~3 min',[
-      {type:'rail',lbl:'Memorize &mdash; your side',text:`"On our end: I\'m ${esc(name)}, your project manager &mdash; main point of contact through onboarding. [Technical Lead] is also on the line today. We\'ll have more folks join as we get further into the project."`},
-      {type:'fill',hot:false,text:`After your intro, invite ${esc(client)}: "I'd love to have everyone on your side do a quick intro &mdash; name, role, and anything specific you're hoping to get out of today."`},
-      {type:null,tip:'Pay attention during their intros. Note who\'s technical vs. leadership &mdash; it changes how you frame the rest of the call and the whole project.'}
+    html+=ph(2,"Team introductions","~3 min",[
+      {type:"rail",lbl:"Memorize \u2014 your side",text:""On our end: I'm "+esc(name)+", your project manager \u2014 main point of contact through onboarding. [Technical Lead] is also on the line today. We'll have more folks join as we get further into the project.""},
+      {type:"fill",hot:false,lbl:"Fill in \u2014 invite client side",text:"After your intro, invite "+esc(client)+": <em>"I'd love to have everyone on your side do a quick intro \u2014 name, role, and anything specific you're hoping to get out of today."</em>"},
+      {type:null,tip:"Pay attention during their intros. Note who's technical vs. leadership \u2014 it changes how you frame the rest of the call."}
     ]);
-    html += ph(3,'Agenda overview','~1 min',[
-      {type:'rail',lbl:'Memorize',text:`"Here\'s what we\'re covering today: quick overview of ${esc(company)} and how we work, the project roadmap, how you\'ll track progress, and we\'ll close with next steps. Goal is to walk away knowing exactly what\'s happening and who\'s doing what."`}
+    html+=ph(3,"Agenda overview","~1 min",[
+      {type:"rail",lbl:"Memorize",text:""Here's what we're covering today: quick overview of "+esc(company)+" and how we work, the project roadmap, how you'll track progress, and we'll close with next steps. Goal is to walk away knowing exactly what's happening and who's doing what.""}
     ]);
-    html += ph(4,'Company overview + scope','~5 min',[
-      {type:'rail',lbl:'Memorize &mdash; lead-in',text:`"Let me give you a quick rundown of who ${esc(company)} is and how this works &mdash; then we\'ll get into your project."`},
-      {type:'fill',hot:false,text:`1. 24/7 managed security services &mdash; goal is to extend ${esc(client)}'s team, not replace it.<br>2. Core service: SOC as a service &mdash; continuous monitoring, triage, escalation, response.<br>3. Workflow: alerts from your tools &rarr; enrichment &rarr; our analysts &rarr; escalation only when it matters.<br>4. Communication: [ticketing system] for escalations, [project tracker] for onboarding, weekly calls for status.<br>5. Live means: SOC monitoring 24/7, your team only gets called for what genuinely needs your attention.`},
-      {type:null,tip:'When it gets technical, hand it off cleanly: &ldquo;[Lead], take it from here on the workflow.&rdquo; You own the project. They own the details. That\'s the right split.'}
+    html+=ph(4,"Company overview + scope","~5 min",[
+      {type:"rail",lbl:"Memorize \u2014 lead-in",text:""Let me give you a quick rundown of who "+esc(company)+" is and how this works \u2014 then we'll get into your project.""},
+      {type:"fill",hot:false,lbl:"Walk through these points",text:"\u2022 We're a 24/7 managed security provider \u2014 goal is to extend "+esc(client)+"'s team, not replace it.<br>\u2022 Core service is SOC as a service \u2014 continuous monitoring, triage, escalation, and response.<br>\u2022 How it works: alerts from your tools go through enrichment, our analysts investigate, and we only escalate what actually needs your attention.<br>\u2022 Communication: [ticketing system] for escalations and requests, [project tracker] for onboarding progress, weekly calls for status.<br>\u2022 When we go live, your team gets called for things that matter \u2014 not every alert."},
+      {type:null,tip:"When it gets technical, hand it off: '[Lead], take it from here on the workflow.' You own the project. They own the details."}
     ]);
-    html += ph(5,'Implementation milestones','~5 min',[
-      {type:'rail',lbl:'Memorize',text:'"Let me walk you through how the project runs from today all the way to go-live &mdash; I\'ll pull up our tracker real quick."'},
-      {type:'fill',hot:false,text:'Walk your project tracker. Cover: Kickoff &rarr; Discovery &rarr; Configure + Ingest &rarr; Baseline Review &rarr; SOC Meet &amp; Greet &rarr; Go-Live.<br><br>Estimated end date: [from project tracker]. Factors that affect timing: questionnaire turnaround, access provisioning, log ingestion.'},
-      {type:null,tip:'Know the end date before you screen share. Go straight to the right view &mdash; don\'t hunt around while they\'re watching. Dead air while you\'re searching is where stumbling lives.'}
+    html+=ph(5,"Implementation milestones","~5 min",[
+      {type:"rail",lbl:"Memorize",text:""Let me walk you through how the project runs from today all the way to go-live \u2014 I'll pull up our tracker real quick.""},
+      {type:"fill",hot:false,lbl:"Walk the project tracker",text:"Phases: Kickoff \u2192 Discovery \u2192 Configure + Ingest \u2192 Baseline Review \u2192 SOC Meet &amp; Greet \u2192 Go-Live.<br><br>End date estimate: [from tracker]. Things that affect the timeline: questionnaire turnaround, access provisioning, log ingestion speed."},
+      {type:null,tip:"Know the end date before you screen share. Go straight to the right view \u2014 don't hunt around while they're watching."}
     ]);
-    html += ph(6,'Next steps','~5 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before I let you all go &mdash; here\'s exactly what\'s happening after this call."'},
-      {type:'fill',hot:false,text:`1. Follow-up email within the hour: deck, questionnaire, access sheet, weekly call times.<br>2. Questionnaire: fill out what you can quickly. Anything that takes months &mdash; skip it for now.<br>3. Weekly cadence: proposing [day] at [time]. Does that work for everyone?`},
-      {type:'rail',lbl:'Memorize &mdash; close',text:`"That wraps up our kickoff. Really excited to be working with ${esc(client)} &mdash; you're in good hands. Watch for my email within the hour. ${esc(contact)}, if anything comes up before our first weekly call, my inbox is always open. Thanks everyone &mdash; great meeting."`}
+    html+=ph(6,"Next steps + close","~5 min",[
+      {type:"rail",lbl:"Memorize",text:""Before I let you all go \u2014 here's exactly what's happening after this call.""},
+      {type:"fill",hot:false,lbl:"Confirm these three items",text:"1. Follow-up email within the hour: kickoff deck, questionnaire, access sheet, weekly call times.<br>2. Questionnaire: fill out what you can quickly. Anything that takes a while to dig up, skip it for now.<br>3. Weekly cadence: proposing [day] at [time]. Work for everyone?"},
+      {type:"rail",lbl:"Memorize \u2014 close",text:""Alright, that's a wrap on the kickoff. Really glad to be working with "+esc(client)+" \u2014 good things ahead. You'll hear from me within the hour. "+esc(contact)+", anything comes up before our first weekly, just reach out. Thanks everyone.""},
+      {type:null,tip:"End with energy and warmth. First impression stays with them. Land the close and stop \u2014 don't trail off."}
     ]);
   } else {
-    html += ph(1,'Opening','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:`"Hey ${esc(contact)} &mdash; ${esc(name)} here with ${esc(company)}. Good [morning/afternoon]. Thanks for jumping on, let's get into it."`},
-      {type:null,tip:`Their name first &mdash; every time. If your mind blanks at the opener, just say their name and the rest follows.`}
+    html+=ph(1,"Opening","~30 sec",[
+      {type:"rail",lbl:"Memorize",text:""Hey "+esc(contact)+" \u2014 "+esc(name)+" here with "+esc(company)+". Good [morning/afternoon]. Thanks for jumping on, let's get into it.""},
+      {type:null,tip:"Their name first \u2014 every time. If your mind blanks at the opener, just say their name and the rest follows."}
     ]);
-    html += ph(2,'Agenda set','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:'"So real quick &mdash; I want to run through what we each had from last week, give you an update on where things are, flag anything that needs your attention, and close out with next steps. Shouldn\'t take long."'},
-      {type:null,tip:'Don\'t skip this. Twenty seconds, and it gives both of you a map for the whole call. When you drift mid-call, you can always come back to which of these four you\'re on.'}
+    html+=ph(2,"Agenda set","~30 sec",[
+      {type:"rail",lbl:"Memorize",text:""So real quick \u2014 I want to run through what we each had from last week, give you an update on where things are, flag anything that needs your attention, and close out with next steps. Shouldn't take long.""},
+      {type:null,tip:"Don't skip this. Twenty seconds, and it gives both of you a map for the whole call. When you drift mid-call, you can come back to which of these four you're on."}
     ]);
-    html += ph(3,'Action item review','2&ndash;3 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before I get into this week &mdash; let me do a quick check on where we landed from last week."'},
-      {type:'fill',...rev},
-      {type:'rail',lbl:'Memorize &mdash; all wrapped up',text:'"Everything\'s taken care of from last week &mdash; clean slate going into today."'},
-      {type:'rail',lbl:'Memorize &mdash; things still in flight',text:'"Got a few things still in progress from last week &mdash; I\'ll make sure we capture those before we close out."'},
-      {type:null,tip:'Look at your tickets before the call. Five minutes in Zendesk the morning of means you know every status cold &mdash; and that\'s what stops stumbling here.'}
+    html+=ph(3,"Last call check-in","2\u20133 min",[
+      {type:"rail",lbl:"Memorize",text:""Before I get into this week \u2014 let me do a quick check on where we landed from last week.""},
+      {type:"fill",...rev},
+      {type:"rail",lbl:"Memorize \u2014 all wrapped up",text:""Everything's taken care of from last week \u2014 clean slate going into today.""},
+      {type:"rail",lbl:"Memorize \u2014 things still in flight",text:""Got a few things still in progress from last week \u2014 I'll make sure we capture those before we close out.""},
+      {type:null,tip:"Look at your tickets before the call. Knowing every status cold is what stops stumbling here \u2014 not the script."}
     ]);
-    html += ph(4,'Status update','5&ndash;10 min',[
-      {type:'rail',lbl:'Memorize',text:'"Alright &mdash; here\'s where we\'re at right now."'},
-      {type:'fill',...stat},
-      {type:null,tip:'Start with something positive &mdash; even one small win. Then run through what\'s in progress with dates, then anything you need to flag. That order keeps the energy positive and the call moving forward.'}
+    html+=ph(4,"Status update","5\u201310 min",[
+      {type:"rail",lbl:"Memorize",text:""Alright \u2014 here's where we're at right now.""},
+      {type:"fill",...stat},
+      {type:null,tip:"Start with something positive \u2014 even one small win. Then in-progress with dates, then anything you need to flag. That order keeps the energy positive and the call moving."}
     ]);
-    html += ph(5,'Needs from client','2 min',[
-      {type:'rail',lbl:'Memorize',text:'"Before I let you go &mdash; I do need a couple of things from your end to keep things moving on our side."'},
-      {type:'fill',...need},
-      {type:'rail',lbl:'Memorize &mdash; no blockers',text:`"Nothing blocking us from ${esc(client)}'s side right now &mdash; we're clear to keep driving forward."`},
-      {type:null,tip:'Specific ask, specific date. If there\'s no deadline, it won\'t happen. &ldquo;I need this by Friday&rdquo; is a deadline. &ldquo;Whenever you can&rdquo; isn\'t.'}
+    html+=ph(5,"What I need from you","2 min",[
+      {type:"rail",lbl:"Memorize",text:""Before I let you go \u2014 I do need a couple of things from your end to keep things moving on our side.""},
+      {type:"fill",...need},
+      {type:"rail",lbl:"Memorize \u2014 nothing needed",text:""Nothing holding us up from your end right now \u2014 we're good to keep moving.""},
+      {type:null,tip:"Specific ask, specific date. 'I need this by Friday' is a deadline. 'Whenever you can' isn't."}
     ]);
-    html += ph(6,'Next steps','2 min',[
-      {type:'rail',lbl:'Memorize',text:'"Last thing before I let you go &mdash; let me make sure we\'re on the same page on next steps and who\'s got what."'},
-      {type:'fill',...next},
-      {type:null,tip:'Read them back out loud &mdash; name, what they\'re doing, when. Then ask if anything got missed. This is where you prove you ran a tight meeting.'}
+    html+=ph(6,"Next steps","2 min",[
+      {type:"rail",lbl:"Memorize",text:""Last thing before I let you go \u2014 let me make sure we're on the same page on next steps and who's got what.""},
+      {type:"fill",...nxt},
+      {type:null,tip:"Read them back out loud \u2014 name, what they're doing, when. Then ask if anything got missed. This is where you show you ran a tight meeting."}
     ]);
-    html += ph(7,'Close','~30 sec',[
-      {type:'rail',lbl:'Memorize',text:`"Alright, that\'s everything for today. I\'ll get the recap out with all the action items by [time]. Anything comes up before next week, just shoot me a message. Thanks ${esc(contact)}, appreciate the time."`},
-      {type:null,tip:'Name a time and stick to it. &ldquo;By end of day&rdquo; works. &ldquo;I\'ll send something later&rdquo; is how recaps don\'t happen.'}
+    html+=ph(7,"Close","~30 sec",[
+      {type:"rail",lbl:"Memorize",text:""Alright, that's everything for today. I'll get the recap out with all the action items by [time]. Anything comes up before next week, just shoot me a message. Thanks "+esc(contact)+", appreciate the time.""},
+      {type:null,tip:"Name a time and stick to it. 'By end of day' works. 'I'll send something later' is how recaps don't get sent."}
     ]);
   }
-
-  const out=document.getElementById('output');
-  out.innerHTML=html;
-  out.className='script-out on';
-  document.getElementById('printbtn').style.display='inline-block';
-  out.scrollIntoView({behavior:'smooth',block:'start'});
+  var out=document.getElementById("script-out");
+  out.innerHTML=html;out.className="script-out on";
+  out.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 // Init
-renderCols();
+renderCols();renderU("wins");renderU("prog");renderU("flags");renderU("needs");renderU("next");
 </script>
 </body>
 </html>
